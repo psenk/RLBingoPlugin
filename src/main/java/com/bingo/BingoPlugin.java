@@ -28,6 +28,7 @@ public class BingoPlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		log.info("Example started!");
+		this.isStarted = true;
 	}
 
 	@Override
@@ -50,4 +51,8 @@ public class BingoPlugin extends Plugin
 	{
 		return configManager.getConfig(BingoConfig.class);
 	}
+
+	// my code starts here
+
+	boolean isStarted;
 }
