@@ -1,17 +1,24 @@
 package com.bingo;
 
-import net.runelite.api.Client;
-import net.runelite.client.RuneLite;
-import net.runelite.client.externalplugins.ExternalPluginManager;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
 
 public class BingoPluginTest
 {
 	public static void main(String[] args) throws Exception
 	{
-		ExternalPluginManager.loadBuiltin(BingoPlugin.class);
-		RuneLite.main(args);
+		/*
+		 * ExternalPluginManager.loadBuiltin(BingoPlugin.class);
+		 * RuneLite.main(args);
+		 */
+
+		Result result = JUnitCore.runClasses(TestSuite.class);
+
+		for (Failure failure : result.getFailures()) {
+			System.out.println(failure.toString());
+		}
+
+		System.out.println(result.wasSuccessful());
 	}
 }

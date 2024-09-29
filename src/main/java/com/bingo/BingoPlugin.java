@@ -1,7 +1,6 @@
 package com.bingo;
 
 import com.google.inject.Provides;
-import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -11,6 +10,8 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+
+import javax.inject.Inject;
 
 @Slf4j
 @PluginDescriptor(
@@ -35,6 +36,7 @@ public class BingoPlugin extends Plugin
 	protected void shutDown() throws Exception
 	{
 		log.info("Example stopped!");
+		this.isStarted = false;
 	}
 
 	@Subscribe
@@ -54,5 +56,5 @@ public class BingoPlugin extends Plugin
 
 	// my code starts here
 
-	boolean isStarted;
+	public boolean isStarted;
 }
