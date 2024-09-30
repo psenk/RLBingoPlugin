@@ -5,15 +5,13 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
 @ConfigGroup("bingo")
-public interface BingoConfig extends Config
-{
-	@ConfigItem(
-		keyName = "greeting",
-		name = "Welcome Greeting",
-		description = "The message to show to the user when they login"
-	)
-	default String greeting()
-	{
-		return "Hello";
-	}
+public interface BingoConfig extends Config {
+    @ConfigItem(
+            keyName = "box",
+            name = "This is a box",
+            description = "Default box text"
+    )
+    default String box() {
+        return "Box";
+    }
 }

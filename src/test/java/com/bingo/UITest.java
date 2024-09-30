@@ -1,17 +1,18 @@
 package com.bingo;
 
-import org.junit.Before;
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class UITest {
 
-    // Create a subclass that exposes startUp() and shutDown()
-    private static class TestBingoPlugin extends BingoPlugin {
+    private static class TestBingoScapePlugin extends BingoScapePlugin
+	{
         @Override
         public void startUp() throws Exception {
             super.startUp();
@@ -24,9 +25,9 @@ public class UITest {
     }
 
     @InjectMocks
-    private TestBingoPlugin plugin;
+    private TestBingoScapePlugin plugin;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
         plugin.startUp();
