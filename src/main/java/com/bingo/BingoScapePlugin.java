@@ -42,8 +42,13 @@ public class BingoScapePlugin extends Plugin
 		//log.info("Example started!");
 		this.isStarted = true;
 
-		mainPanel = new MainPanel();
-		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "/icon.png");
+		this.mainPanel = new MainPanel(this);
+		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "/com/bingo/icon.png");
+
+		if (icon == null)
+		{
+			return;
+		}
 		navigationButton = NavigationButton.builder()
 			.tooltip("BingoScape")
 			.icon(icon)
