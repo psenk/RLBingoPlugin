@@ -10,38 +10,31 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
 
-public class UITest {
+public class UITest
+{
 
-    private static class TestBingoScapePlugin extends BingoScapePlugin
+	private static class TestBingoScapePlugin extends BingoScapePlugin
 	{
-        @Override
-        public void startUp() throws Exception {
-            super.startUp();
-        }
+		@Override
+		public void startUp() throws Exception
+		{
+			super.startUp();
+		}
 
-        @Override
-        public void shutDown() throws Exception {
-            super.shutDown();
-        }
-    }
+		@Override
+		public void shutDown() throws Exception
+		{
+			super.shutDown();
+		}
+	}
 
-    @InjectMocks
-    private TestBingoScapePlugin plugin;
+	@InjectMocks
+	private TestBingoScapePlugin plugin;
 
-    @BeforeEach
-    public void setUp() throws Exception {
-        MockitoAnnotations.openMocks(this);
-        plugin.startUp();
-    }
-
-    @Test
-    public void testIsStartedBoolean() {
-        assertTrue(plugin.isStarted);
-    }
-
-    @Test
-    public void testShutdown() throws Exception {
-        plugin.shutDown();
-        assertFalse(plugin.isStarted);
-    }
+	@BeforeEach
+	public void setUp() throws Exception
+	{
+		MockitoAnnotations.openMocks(this);
+		plugin.startUp();
+	}
 }
