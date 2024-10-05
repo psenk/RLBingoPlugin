@@ -34,7 +34,7 @@ public class MainBingoPanel extends PluginPanel
 	{
 		super(false);
 		this.plugin = plugin;
-		this.buttonsPanel = new JPanel(new BorderLayout());
+		this.buttonsPanel = new JPanel(new BorderLayout(0,10));
 
 		this.activeBingoButton = buttonBuilder(BingoConfig.Panel.ACTIVE);
 		this.createBingoButton = buttonBuilder(BingoConfig.Panel.CREATE);
@@ -106,10 +106,5 @@ public class MainBingoPanel extends PluginPanel
 	}
 
 	// TODO: build the plugin panel
-
-
-	// NOTES:
-	// - use static initializers
-	// Java Swift!
-	// Add titles and buttons to all Panels
+	// TODO: spread buttons apart
 }

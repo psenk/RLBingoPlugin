@@ -8,21 +8,24 @@ import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
 
-public class ContainerPanel extends PluginPanel
+public class BingoScapePluginPanel extends PluginPanel
 {
 	private static final String TITLE;
 	private static final ImageIcon GITHUB_ICON;
 	private static final ImageIcon GITHUB_ICON_HOVER;
 	private static final ImageIcon HOME_ICON;
 	private static final ImageIcon HOME_ICON_HOVER;
+
 	private final JPanel headerPanel;
 	private final JPanel headerButtons;
 	private final JLabel titleLabel;
@@ -31,6 +34,7 @@ public class ContainerPanel extends PluginPanel
 	String GITHUB_LINK = "https://github.com/psenk/RLBingoPlugin";
 
 	private final BingoScapePlugin plugin;
+	private final JPanel contentPanel;
 
 	static
 	{
@@ -45,14 +49,21 @@ public class ContainerPanel extends PluginPanel
 		TITLE = "BingoScape";
 	}
 
-	public ContainerPanel(final BingoScapePlugin plugin)
+	public BingoScapePluginPanel(final BingoScapePlugin plugin)
 	{
 		super(false);
 		this.plugin = plugin;
+
+		this.setLayout(new BorderLayout());
 		this.headerPanel = new JPanel(new BorderLayout());
+		this.contentPanel = new JPanel();
+		contentPanel.setVisible(true);
 
 		this.titleLabel = new JLabel(TITLE);
 		titleLabel.setForeground(Color.WHITE);
+		titleLabel.setBorder(new EmptyBorder(10, 10, 5, 0));
+		headerPanel.add(Box.createHorizontalStrut(10));
+		headerPanel.add(titleLabel, BorderLayout.WEST);
 
 		this.githubButton = new JLabel(GITHUB_ICON);
 		githubButton.setVisible(true);
@@ -108,17 +119,16 @@ public class ContainerPanel extends PluginPanel
 			}
 		});
 
+
 		this.headerButtons = new JPanel();
-		headerButtons.setLayout(new FlowLayout(FlowLayout.RIGHT, 20, 5));
+		headerButtons.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 5));
 		headerButtons.add(homeButton);
 		headerButtons.add(githubButton);
 
-		final JPanel headerTopRow = new JPanel(new BorderLayout());
-		headerTopRow.add(titleLabel, BorderLayout.WEST);
-		headerTopRow.add(headerButtons, BorderLayout.EAST);
+		headerPanel.add(headerButtons, BorderLayout.EAST);
 
-		headerPanel.add(headerTopRow, BorderLayout.NORTH);
 		this.add(headerPanel, BorderLayout.NORTH);
+		this.add(contentPanel, BorderLayout.CENTER);
 		this.revalidate();
 		this.repaint();
 	}
@@ -126,5 +136,10 @@ public class ContainerPanel extends PluginPanel
 	public void updateHomeButton(boolean onMainPage)
 	{
 		homeButton.setVisible(!onMainPage);
+	}
+
+	public <T extends PluginPanel> void addPanel(PluginPanel p)
+	{
+		this.contentPanel.add(p, BorderLayout.CENTER);
 	}
 }

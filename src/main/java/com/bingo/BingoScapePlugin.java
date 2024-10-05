@@ -1,7 +1,7 @@
 package com.bingo;
 
 import com.bingo.panels.ActiveBingoPanel;
-import com.bingo.panels.ContainerPanel;
+import com.bingo.panels.BingoScapePluginPanel;
 import com.bingo.panels.CreateBingoPanel;
 import com.bingo.panels.MainBingoPanel;
 import com.bingo.panels.ModifyBingoPanel;
@@ -41,7 +41,7 @@ public class BingoScapePlugin extends Plugin
 	@Inject
 	private BingoConfig config;
 
-	private ContainerPanel containerPanel;
+	private BingoScapePluginPanel bingoScapePluginPanel;
 	private MainBingoPanel mainBingoPanel;
 	private ActiveBingoPanel activeBingoPanel;
 	private CreateBingoPanel createBingoPanel;
@@ -53,16 +53,16 @@ public class BingoScapePlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		//log.info("Example started!");
-		this.containerPanel = new ContainerPanel(this);
+		this.bingoScapePluginPanel = new BingoScapePluginPanel(this);
 		this.mainBingoPanel = new MainBingoPanel(this);
 		this.activeBingoPanel = new ActiveBingoPanel(this);
 		this.createBingoPanel = new CreateBingoPanel(this);
 		this.modifyBingoPanel = new ModifyBingoPanel(this);
 
-		containerPanel.add(mainBingoPanel);
-		containerPanel.add(activeBingoPanel);
-		containerPanel.add(createBingoPanel);
-		containerPanel.add(modifyBingoPanel);
+		bingoScapePluginPanel.addPanel(mainBingoPanel);
+		bingoScapePluginPanel.addPanel(activeBingoPanel);
+		bingoScapePluginPanel.addPanel(createBingoPanel);
+		bingoScapePluginPanel.addPanel(modifyBingoPanel);
 
 		mainBingoPanel.setVisible(true);
 		this.onMainPage = true;
@@ -81,10 +81,10 @@ public class BingoScapePlugin extends Plugin
 			.tooltip("BingoScape")
 			.icon(icon)
 			.priority(100)
-			.panel(containerPanel)
+			.panel(bingoScapePluginPanel)
 			.build();
 		clientToolbar.addNavigation(navigationButton);
-		containerPanel.setVisible(true);
+		bingoScapePluginPanel.setVisible(true);
 	}
 
 	protected void setActivePanel(PluginPanel panel)
@@ -101,8 +101,8 @@ public class BingoScapePlugin extends Plugin
 		modifyBingoPanel.setVisible(false);
 		panel.setVisible(true);
 
-		containerPanel.revalidate();
-		containerPanel.repaint();
+		bingoScapePluginPanel.revalidate();
+		bingoScapePluginPanel.repaint();
 	}
 
 	public void panelSelector(BingoConfig.Panel p)
@@ -130,7 +130,7 @@ public class BingoScapePlugin extends Plugin
 				config.setActivePanel(BingoConfig.Panel.MODIFY);
 				break;
 		}
-		containerPanel.updateHomeButton(this.onMainPage);
+		bingoScapePluginPanel.updateHomeButton(this.onMainPage);
 	}
 
 	@Override
