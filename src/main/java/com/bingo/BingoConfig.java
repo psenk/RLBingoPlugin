@@ -1,5 +1,6 @@
 package com.bingo;
 
+import com.bingo.io.Token;
 import lombok.Getter;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
@@ -55,4 +56,24 @@ public interface BingoConfig extends Config
 		hidden = true
 	)
 	void setActivePanel(Panel p);
+
+	@ConfigItem(
+		keyName = "sessionToken",
+		name = "Session Token",
+		description = "Active session token.",
+		hidden = true
+	)
+	default Token activeToken()
+	{
+		return null;
+	}
+
+	@ConfigItem(
+		keyName = "sessionToken",
+		name = "",
+		description = "",
+		hidden = true
+	)
+	void setActiveToken(Token token);
+
 }

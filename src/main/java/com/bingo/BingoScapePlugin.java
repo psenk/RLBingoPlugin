@@ -23,6 +23,8 @@ import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 
+// TODO:
+
 @Slf4j
 @PluginDescriptor(
 	name = "BingoScape"
@@ -55,7 +57,7 @@ public class BingoScapePlugin extends Plugin
 		//log.info("Example started!");
 		this.bingoScapePluginPanel = new BingoScapePluginPanel(this);
 		this.mainBingoPanel = new MainBingoPanel(this);
-		this.activeBingoPanel = new ActiveBingoPanel(this);
+		this.activeBingoPanel = new ActiveBingoPanel(this, config);
 		this.createBingoPanel = new CreateBingoPanel(this);
 		this.modifyBingoPanel = new ModifyBingoPanel(this);
 
@@ -137,6 +139,7 @@ public class BingoScapePlugin extends Plugin
 	protected void shutDown() throws Exception
 	{
 		//log.info("Example stopped!");
+		// TODO: do i need to log out of something here?
 		clientToolbar.removeNavigation(navigationButton);
 	}
 
