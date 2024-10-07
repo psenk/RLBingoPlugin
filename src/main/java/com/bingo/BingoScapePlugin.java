@@ -1,5 +1,6 @@
 package com.bingo;
 
+import com.bingo.io.Token;
 import com.bingo.panels.ActiveBingoPanel;
 import com.bingo.panels.BingoScapePluginPanel;
 import com.bingo.panels.CreateBingoPanel;
@@ -7,6 +8,7 @@ import com.bingo.panels.MainBingoPanel;
 import com.bingo.panels.ModifyBingoPanel;
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +45,9 @@ public class BingoScapePlugin extends Plugin
 	@Inject
 	private BingoConfig config;
 
+	@Inject
+	private ConfigManager configManager;
+
 	private BingoScapePluginPanel bingoScapePluginPanel;
 	private MainBingoPanel mainBingoPanel;
 	private ActiveBingoPanel activeBingoPanel;
@@ -57,7 +62,7 @@ public class BingoScapePlugin extends Plugin
 		//log.info("Example started!");
 		this.bingoScapePluginPanel = new BingoScapePluginPanel(this);
 		this.mainBingoPanel = new MainBingoPanel(this);
-		this.activeBingoPanel = new ActiveBingoPanel(this, config);
+		this.activeBingoPanel = new ActiveBingoPanel(this);
 		this.createBingoPanel = new CreateBingoPanel(this);
 		this.modifyBingoPanel = new ModifyBingoPanel(this);
 
@@ -78,7 +83,7 @@ public class BingoScapePlugin extends Plugin
 			log.warn("plugin icon is null");
 			return;
 		}
-		config.setActivePanel(BingoConfig.Panel.MAIN);
+		setActiveConfigPanel(BingoConfig.Panel.MAIN);
 		navigationButton = NavigationButton.builder()
 			.tooltip("BingoScape")
 			.icon(icon)
@@ -114,22 +119,22 @@ public class BingoScapePlugin extends Plugin
 			case MAIN:
 				this.onMainPage = true;
 				setActivePanel(mainBingoPanel);
-				config.setActivePanel(BingoConfig.Panel.MAIN);
+				setActiveConfigPanel(BingoConfig.Panel.MAIN);
 				break;
 			case ACTIVE:
 				this.onMainPage = false;
 				setActivePanel(activeBingoPanel);
-				config.setActivePanel(BingoConfig.Panel.ACTIVE);
+				setActiveConfigPanel(BingoConfig.Panel.ACTIVE);
 				break;
 			case CREATE:
 				this.onMainPage = false;
 				setActivePanel(createBingoPanel);
-				config.setActivePanel(BingoConfig.Panel.CREATE);
+				setActiveConfigPanel(BingoConfig.Panel.CREATE);
 				break;
 			case MODIFY:
 				this.onMainPage = false;
 				setActivePanel(modifyBingoPanel);
-				config.setActivePanel(BingoConfig.Panel.MODIFY);
+				setActiveConfigPanel(BingoConfig.Panel.MODIFY);
 				break;
 		}
 		bingoScapePluginPanel.updateHomeButton(this.onMainPage);
@@ -158,5 +163,18 @@ public class BingoScapePlugin extends Plugin
 		return configManager.getConfig(BingoConfig.class);
 	}
 
+	public void setActiveConfigPanel(BingoConfig.Panel p)
+	{
+		configManager.setConfiguration("bingo", "activePanel", p);
+	}
 
+	public void setActiveToken(Token t)
+	{
+		configManager.setConfiguration("bingo", "activeToken", t);
+	}
+
+	public Token getActiveToken()
+	{
+		return (Token) configManager.getConfiguration("bingo", "activeToken", Token.class);
+	}
 }

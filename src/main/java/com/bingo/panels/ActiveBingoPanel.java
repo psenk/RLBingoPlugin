@@ -2,8 +2,10 @@ package com.bingo.panels;
 
 import com.bingo.BingoConfig;
 import com.bingo.BingoScapePlugin;
+import javax.inject.Inject;
 import javax.swing.JPanel;
 import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.ui.PluginPanel;
 
 @ConfigGroup("bingo")
@@ -11,26 +13,27 @@ public class ActiveBingoPanel extends PluginPanel
 {
 	public BingoConfig.Panel id = BingoConfig.Panel.ACTIVE;
 
-	private final JPanel headerPanel;
+	@Inject
+	private ConfigManager configManager;
 
 	private final AuthPanel authPanel;
 	private final JPanel teamPanel;
 
-	private final BingoScapePlugin plugin;
+	protected final BingoScapePlugin plugin;
 
 	// TODO: icons?
 	// TODO: enums: bosses, actions/tasks
 
-	public ActiveBingoPanel(final BingoScapePlugin plugin, BingoConfig config)
+	public ActiveBingoPanel(final BingoScapePlugin plugin)
 	{
 		super(false);
 		this.plugin = plugin;
 
-		headerPanel = new JPanel();
+		JPanel headerPanel = new JPanel();
 		headerPanel.setVisible(true);
 
 		// auth panel
-		authPanel = new AuthPanel(config, this);
+		authPanel = new AuthPanel(this);
 		headerPanel.add(authPanel);
 
 		// TODO: await?
@@ -38,22 +41,19 @@ public class ActiveBingoPanel extends PluginPanel
 		teamPanel = new JPanel();
 		teamPanel.setVisible(false);
 
-		updatePanelVisibility(config);
-
 		this.add(headerPanel);
+		this.updatePanelVisibility();
 	}
 
-	public void updatePanelVisibility(BingoConfig config)
+	public void updatePanelVisibility()
 	{
-		if (config.activeToken() != null)
+		if (plugin.getActiveToken() != null) // TODO: isValidToken()?
 		{
 			authPanel.setVisible(false);
 			teamPanel.setVisible(true);
+			return;
 		}
-		else
-		{
-			authPanel.setVisible(true);
-			teamPanel.setVisible(false);
-		}
+		authPanel.setVisible(true);
+		teamPanel.setVisible(false);
 	}
 }

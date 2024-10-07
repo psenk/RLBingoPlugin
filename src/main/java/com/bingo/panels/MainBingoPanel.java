@@ -9,7 +9,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import net.runelite.client.config.ConfigGroup;
@@ -21,51 +20,38 @@ public class MainBingoPanel extends PluginPanel
 {
 	public BingoConfig.Panel id = BingoConfig.Panel.MAIN;
 
-	private final JPanel buttonsPanel;
-	private final JScrollPane contentWrapperPane;
-
-	private final JPanel activeBingoButton;
-	private final JPanel createBingoButton;
-	private final JPanel modifyBingoButton;
-
 	private final BingoScapePlugin plugin;
 
 	public MainBingoPanel(final BingoScapePlugin plugin)
 	{
 		super(false);
 		this.plugin = plugin;
-		this.buttonsPanel = new JPanel(new BorderLayout(0,10));
 
-		this.activeBingoButton = buttonBuilder(BingoConfig.Panel.ACTIVE);
-		this.createBingoButton = buttonBuilder(BingoConfig.Panel.CREATE);
-		this.modifyBingoButton = buttonBuilder(BingoConfig.Panel.MODIFY);
+		JPanel activeBingoButton = buttonBuilder(BingoConfig.Panel.ACTIVE);
+		JPanel createBingoButton = buttonBuilder(BingoConfig.Panel.CREATE);
+		JPanel modifyBingoButton = buttonBuilder(BingoConfig.Panel.MODIFY);
 
-		buttonsPanel.add(activeBingoButton, BorderLayout.NORTH);
-		buttonsPanel.add(createBingoButton, BorderLayout.CENTER);
-		buttonsPanel.add(modifyBingoButton, BorderLayout.SOUTH);
-
-		// add all in here
 		final JPanel contentPanel = new JPanel();
 		final BoxLayout contentLayout = new BoxLayout(contentPanel, BoxLayout.Y_AXIS);
 		contentPanel.setLayout(contentLayout);
-		contentPanel.add(buttonsPanel);
 
-		final JPanel contentWrapper = new JPanel(new BorderLayout());
-		contentWrapper.add(contentPanel, BorderLayout.NORTH);
-		this.contentWrapperPane = new JScrollPane(contentWrapper);
-		contentWrapperPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		JPanel buttonsPanel = new JPanel(new BorderLayout(0, 10));
+		buttonsPanel.add(activeBingoButton, BorderLayout.NORTH);
+		buttonsPanel.add(createBingoButton, BorderLayout.CENTER);
+		buttonsPanel.add(modifyBingoButton, BorderLayout.SOUTH);
+		contentPanel.add(buttonsPanel);
 
 		setLayout(new BorderLayout());
 		setBorder(new EmptyBorder(10, 10, 10, 10));
-		add(contentWrapperPane, BorderLayout.CENTER);
+		add(contentPanel, BorderLayout.CENTER);
 	}
 
 	private JPanel buttonBuilder(BingoConfig.Panel panel)
 	{
 		JPanel button = new JPanel();
-		button.add(new JLabel(panel.getTitle()));
+		button.add(new JLabel(panel.title));
 		button.setVisible(true);
-		button.setToolTipText(panel.getTooltip());
+		button.setToolTipText(panel.tooltip);
 		button.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR));
 		button.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		button.addMouseListener(new MouseAdapter()
@@ -104,7 +90,4 @@ public class MainBingoPanel extends PluginPanel
 		});
 		return button;
 	}
-
-	// TODO: build the plugin panel
-	// TODO: spread buttons apart
 }

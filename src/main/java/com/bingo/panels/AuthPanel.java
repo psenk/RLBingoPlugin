@@ -1,13 +1,12 @@
 package com.bingo.panels;
 
-import com.bingo.BingoConfig;
+
 import com.bingo.io.LogIn;
 import com.bingo.io.Token;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.inject.Inject;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -15,17 +14,19 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.components.FlatTextField;
 
+@ConfigGroup("bingo")
 public class AuthPanel extends JPanel
 {
 	private final JLabel submitButton;
-	private final JPanel submitPanel;
 	private final FlatTextField connectTextField;
 	private final FlatTextField passwordTextField;
 
-	public AuthPanel(BingoConfig config, ActiveBingoPanel parent) {
+	public AuthPanel(ActiveBingoPanel parent)
+	{
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		JLabel connectLabel = new JLabel("Connection String:");
@@ -36,18 +37,17 @@ public class AuthPanel extends JPanel
 		connectTextField.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
 		connectTextField.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR));
 
-
 		JLabel passwordLabel = new JLabel("Password:");
 		passwordTextField = new FlatTextField();
 		passwordTextField.setPreferredSize(new Dimension(200, 20));
 		passwordTextField.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
 		passwordTextField.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR));
 
-		add(connectLabel);
-		add(connectTextField);
-		add(Box.createVerticalStrut(10));
-		add(passwordLabel);
-		add(passwordTextField);
+		this.add(connectLabel);
+		this.add(connectTextField);
+		this.add(Box.createVerticalStrut(10));
+		this.add(passwordLabel);
+		this.add(passwordTextField);
 
 		submitButton = new JLabel("Submit");
 		submitButton.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR));
@@ -69,14 +69,15 @@ public class AuthPanel extends JPanel
 				if (SwingUtilities.isLeftMouseButton(e))
 				{
 					Token token = LogIn.getSessionToken(getConnectionString(), getPassword());
-					if (token == null) {
+					if (token == null)
+					{
 						JOptionPane.showMessageDialog(AuthPanel.this, "Login failed. Please check your credentials.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					else
 					{
-						config.setActiveToken(token);
-						parent.updatePanelVisibility(config);
+						parent.plugin.setActiveToken(token);
+						parent.updatePanelVisibility();
 					}
 					submitButton.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 				}
@@ -97,16 +98,18 @@ public class AuthPanel extends JPanel
 			}
 		});
 
-		submitPanel = new JPanel();
+		JPanel submitPanel = new JPanel();
 		submitPanel.add(submitButton);
 		add(submitPanel, BorderLayout.SOUTH);
 	}
 
-	public String getConnectionString() {
+	public String getConnectionString()
+	{
 		return connectTextField.getText();
 	}
 
-	public String getPassword() {
+	public String getPassword()
+	{
 		return passwordTextField.getText();
 	}
 }

@@ -26,14 +26,10 @@ public class BingoScapePluginPanel extends PluginPanel
 	private static final ImageIcon HOME_ICON;
 	private static final ImageIcon HOME_ICON_HOVER;
 
-	private final JPanel headerPanel;
-	private final JPanel headerButtons;
-	private final JLabel titleLabel;
 	private final JLabel githubButton;
 	private final JLabel homeButton;
 	String GITHUB_LINK = "https://github.com/psenk/RLBingoPlugin";
 
-	private final BingoScapePlugin plugin;
 	private final JPanel contentPanel;
 
 	static
@@ -52,14 +48,13 @@ public class BingoScapePluginPanel extends PluginPanel
 	public BingoScapePluginPanel(final BingoScapePlugin plugin)
 	{
 		super(false);
-		this.plugin = plugin;
 
 		this.setLayout(new BorderLayout());
-		this.headerPanel = new JPanel(new BorderLayout());
+		JPanel headerPanel = new JPanel(new BorderLayout());
 		this.contentPanel = new JPanel();
 		contentPanel.setVisible(true);
 
-		this.titleLabel = new JLabel(TITLE);
+		JLabel titleLabel = new JLabel(TITLE);
 		titleLabel.setForeground(Color.WHITE);
 		titleLabel.setBorder(new EmptyBorder(10, 10, 5, 0));
 		headerPanel.add(Box.createHorizontalStrut(10));
@@ -120,7 +115,7 @@ public class BingoScapePluginPanel extends PluginPanel
 		});
 
 
-		this.headerButtons = new JPanel();
+		JPanel headerButtons = new JPanel();
 		headerButtons.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 5));
 		headerButtons.add(homeButton);
 		headerButtons.add(githubButton);

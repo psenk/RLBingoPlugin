@@ -1,16 +1,20 @@
 package com.bingo;
 
 import com.bingo.io.Token;
+import java.awt.Color;
+import java.awt.Dimension;
 import lombok.Getter;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
+// https://github.com/KATalyzt36/TutorialRunelitePlugins
+// https://github.com/runelite/runelite/wiki/Creating-plugin-config-panels
+
 @ConfigGroup("bingo")
 public interface BingoConfig extends Config
 {
-
-	@Getter
+	// TODO: move this enum somewhere else
 	enum Panel
 	{
 		MAIN("", "BingoScape home screen."),
@@ -18,8 +22,8 @@ public interface BingoConfig extends Config
 		CREATE("Create New Bingo", "Create a new bingo event."),
 		MODIFY("Modify Existing Bingo", "Modify an existing bingo event.");
 
-		private final String title;
-		private final String tooltip;
+		public final String title;
+		public final String tooltip;
 
 		Panel(String title, String tooltip)
 		{
@@ -39,6 +43,56 @@ public interface BingoConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "checkbox",
+		name = "This is a checkbox",
+		description = "Default checkbox text"
+	)
+	default boolean checkbox()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "spinner",
+		name = "This is a spinner",
+		description = "Default spinner text"
+	)
+	default int spinner()
+	{
+		return 0;
+	}
+
+	@ConfigItem(
+		keyName = "spinnerx2",
+		name = "This is two spinners",
+		description = "Default spinner text"
+	)
+	default Dimension spinners()
+	{
+		return new Dimension(0, 0);
+	}
+
+	@ConfigItem(
+		keyName = "colorPicker",
+		name = "Color Picker",
+		description = "Default color picker text"
+	)
+	default Color colorPicker()
+	{
+		return Color.BLUE;
+	}
+
+	@ConfigItem(
+		keyName = "combobox",
+		name = "Combo Box",
+		description = "Default combo box text"
+	)
+	default Panel combobox()
+	{
+		return Panel.MAIN;
+	}
+
+	@ConfigItem(
 		keyName = "activePanel",
 		name = "Active Panel",
 		description = "Current active panel.",
@@ -50,16 +104,8 @@ public interface BingoConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "activePanel",
-		name = "",
-		description = "",
-		hidden = true
-	)
-	void setActivePanel(Panel p);
-
-	@ConfigItem(
-		keyName = "sessionToken",
-		name = "Session Token",
+		keyName = "activeToken",
+		name = "Active Token",
 		description = "Active session token.",
 		hidden = true
 	)
@@ -67,13 +113,4 @@ public interface BingoConfig extends Config
 	{
 		return null;
 	}
-
-	@ConfigItem(
-		keyName = "sessionToken",
-		name = "",
-		description = "",
-		hidden = true
-	)
-	void setActiveToken(Token token);
-
 }
