@@ -2,7 +2,6 @@ package com.bingo.panels;
 
 import com.bingo.BingoConfig;
 import com.bingo.BingoScapePlugin;
-import java.sql.SQLOutput;
 import javax.inject.Inject;
 import javax.swing.JPanel;
 import net.runelite.client.config.ConfigGroup;

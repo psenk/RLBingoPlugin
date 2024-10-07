@@ -3,10 +3,10 @@ package com.bingo.io;
 import java.util.Random;
 import lombok.Getter;
 
+@Getter
 public class Token
 {
-	@Getter
-	private Integer id = null;
+	private Integer id = 0;
 
 	public Token()
 	{

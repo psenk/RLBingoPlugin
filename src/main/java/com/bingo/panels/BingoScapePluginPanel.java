@@ -8,6 +8,7 @@ import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -53,6 +54,7 @@ public class BingoScapePluginPanel extends PluginPanel
 		JPanel headerPanel = new JPanel(new BorderLayout());
 		this.contentPanel = new JPanel();
 		contentPanel.setVisible(true);
+		contentPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
 		JLabel titleLabel = new JLabel(TITLE);
 		titleLabel.setForeground(Color.WHITE);

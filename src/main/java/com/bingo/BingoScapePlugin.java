@@ -79,7 +79,7 @@ public class BingoScapePlugin extends Plugin
 		createBingoPanel.setVisible(false);
 		modifyBingoPanel.setVisible(false);
 
-		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "/com/bingo/icon.png");
+		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "/com/bingo/plugin_icon.png");
 		if (icon == null)
 		{
 			log.warn("plugin icon is null");
@@ -195,6 +195,11 @@ public class BingoScapePlugin extends Plugin
 			String blankTokenJson = gson.toJson(blankToken);
 			configManager.setConfiguration("bingo", "activeToken", blankTokenJson);
 		}
-		System.out.println("TOKEN DESTROYED");
+	}
+
+	public void createNewBingo()
+	{
+		modifyBingoPanel.setNewBingo(true);
+		this.panelSelector(BingoConfig.Panel.MODIFY);
 	}
 }

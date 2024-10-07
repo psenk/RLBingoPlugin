@@ -27,7 +27,7 @@ public class AuthPanel extends JPanel
 
 	public AuthPanel(ActiveBingoPanel parent)
 	{
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		JLabel connectLabel = new JLabel("Connection String:");
 		connectLabel.setToolTipText("Enter the connection string for the Bingo.");
@@ -70,7 +70,7 @@ public class AuthPanel extends JPanel
 				if (SwingUtilities.isLeftMouseButton(e))
 				{
 					Token token = LogIn.getSessionToken(getConnectionString(), getPassword());
-					if (token == null)
+					if (token.getId() == 0)
 					{
 						JOptionPane.showMessageDialog(AuthPanel.this, "Login failed. Please check your credentials.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -78,7 +78,6 @@ public class AuthPanel extends JPanel
 					else
 					{
 						parent.plugin.setActiveToken(token);
-						System.out.println("WE MADE IT HERE FOLKS");
 						parent.updatePanelVisibility();
 					}
 					submitButton.setBackground(ColorScheme.DARKER_GRAY_COLOR);
