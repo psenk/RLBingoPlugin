@@ -2,6 +2,7 @@ package com.bingo.panels;
 
 import com.bingo.BingoConfig;
 import com.bingo.BingoScapePlugin;
+import java.sql.SQLOutput;
 import javax.inject.Inject;
 import javax.swing.JPanel;
 import net.runelite.client.config.ConfigGroup;
@@ -47,7 +48,7 @@ public class ActiveBingoPanel extends PluginPanel
 
 	public void updatePanelVisibility()
 	{
-		if (plugin.getActiveToken() != null) // TODO: isValidToken()?
+		if (plugin.getActiveToken().getId() != 0) // TODO: isValidToken()?
 		{
 			authPanel.setVisible(false);
 			teamPanel.setVisible(true);

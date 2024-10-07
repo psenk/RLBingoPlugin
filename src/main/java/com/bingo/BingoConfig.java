@@ -3,7 +3,6 @@ package com.bingo;
 import com.bingo.io.Token;
 import java.awt.Color;
 import java.awt.Dimension;
-import lombok.Getter;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
@@ -111,6 +110,6 @@ public interface BingoConfig extends Config
 	)
 	default Token activeToken()
 	{
-		return null;
+		return new Token(0);
 	}
 }

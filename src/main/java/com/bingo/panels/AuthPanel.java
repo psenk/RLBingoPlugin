@@ -48,6 +48,7 @@ public class AuthPanel extends JPanel
 		this.add(Box.createVerticalStrut(10));
 		this.add(passwordLabel);
 		this.add(passwordTextField);
+		this.add(Box.createVerticalStrut(10));
 
 		submitButton = new JLabel("Submit");
 		submitButton.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR));
@@ -77,6 +78,7 @@ public class AuthPanel extends JPanel
 					else
 					{
 						parent.plugin.setActiveToken(token);
+						System.out.println("WE MADE IT HERE FOLKS");
 						parent.updatePanelVisibility();
 					}
 					submitButton.setBackground(ColorScheme.DARKER_GRAY_COLOR);
@@ -100,7 +102,7 @@ public class AuthPanel extends JPanel
 
 		JPanel submitPanel = new JPanel();
 		submitPanel.add(submitButton);
-		add(submitPanel, BorderLayout.SOUTH);
+		this.add(submitPanel, BorderLayout.SOUTH);
 	}
 
 	public String getConnectionString()

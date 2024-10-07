@@ -8,7 +8,6 @@ import com.bingo.panels.MainBingoPanel;
 import com.bingo.panels.ModifyBingoPanel;
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
-import java.util.Optional;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +23,7 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
+import com.google.gson.Gson;
 
 // TODO:
 
@@ -53,13 +53,15 @@ public class BingoScapePlugin extends Plugin
 	private ActiveBingoPanel activeBingoPanel;
 	private CreateBingoPanel createBingoPanel;
 	private ModifyBingoPanel modifyBingoPanel;
-
 	private NavigationButton navigationButton;
+
+	private final Gson gson = new Gson();
 
 	@Override
 	protected void startUp() throws Exception
 	{
 		//log.info("Example started!");
+		destroyToken();
 		this.bingoScapePluginPanel = new BingoScapePluginPanel(this);
 		this.mainBingoPanel = new MainBingoPanel(this);
 		this.activeBingoPanel = new ActiveBingoPanel(this);
@@ -145,6 +147,7 @@ public class BingoScapePlugin extends Plugin
 	{
 		//log.info("Example stopped!");
 		// TODO: do i need to log out of something here?
+		destroyToken();
 		clientToolbar.removeNavigation(navigationButton);
 	}
 
@@ -170,11 +173,28 @@ public class BingoScapePlugin extends Plugin
 
 	public void setActiveToken(Token t)
 	{
-		configManager.setConfiguration("bingo", "activeToken", t);
+		String tokenJson = gson.toJson(t);
+		configManager.setConfiguration("bingo", "activeToken", tokenJson);
 	}
 
 	public Token getActiveToken()
 	{
-		return (Token) configManager.getConfiguration("bingo", "activeToken", Token.class);
+		String configValue = configManager.getConfiguration("bingo", "activeToken");
+		if (configValue == null)
+		{
+			return null;
+		}
+		return gson.fromJson(configValue, Token.class);
+	}
+
+	public void destroyToken()
+	{
+		if (getActiveToken().getId() != 0)
+		{
+			Token blankToken = new Token(0);
+			String blankTokenJson = gson.toJson(blankToken);
+			configManager.setConfiguration("bingo", "activeToken", blankTokenJson);
+		}
+		System.out.println("TOKEN DESTROYED");
 	}
 }
