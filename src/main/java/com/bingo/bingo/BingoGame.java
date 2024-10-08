@@ -9,6 +9,7 @@ import lombok.Setter;
 
 public class BingoGame
 {
+	@Getter
 	public int bingoID;
 
 	@Getter
@@ -19,46 +20,52 @@ public class BingoGame
 	@Setter
 	public String bingoDescription;
 
-	public Map<Integer, BingoBoard> bingoBoards;
-	public List<String> teams;
+	@Getter
+	@Setter
+	public int bingoDuration;
 
-	public BingoGame(String title, String description) {
-		bingoTitle = title;
-		bingoDescription = description;
-		bingoBoards = new HashMap<Integer, BingoBoard>();
-		teams = new ArrayList<String>();
+	@Getter
+	public List<String> bingoTeams;
+
+	@Getter
+	public Map<Integer, BingoBoard> bingoBoards;
+
+	public BingoGame(int id)
+	{
+		this.bingoID = id;
+	}
+
+	public BingoGame(String title, String description, int duration, List<String> teams, Map<Integer, BingoBoard> boards)
+	{
+		this.bingoTitle = title;
+		this.bingoDescription = description;
+		this.bingoDuration = duration;
+		this.bingoTeams = teams;
+		this.bingoBoards = boards;
 	}
 
 	public void addBingoBoard(BingoBoard board)
 	{
-		bingoBoards.put(bingoBoards.size(), board);
+		this.bingoBoards.put(bingoBoards.size(), board);
 	}
 
 	public void removeBingoBoard(int id)
 	{
-		bingoBoards.remove(id);
+		this.bingoBoards.remove(id);
 	}
 
 	public BingoBoard getBingoBoard(int id)
 	{
-		return bingoBoards.get(id);
+		return this.bingoBoards.get(id);
 	}
 
 	public void addTeam(String team)
 	{
-		teams.add(team);
+		this.bingoTeams.add(team);
 	}
 
 	public void removeTeam(String team)
 	{
-		teams.remove(team);
-	}
-
-	public BingoGame getTestBingo()
-	{
-		BingoGame testBingo = new BingoGame("Test Bingo", "Test Bingo Description");
-		testBingo.addBingoBoard(new BingoBoard(1, "Test Board", 5, 5));
-		testBingo.addTeam("Test Team");
-		return testBingo;
+		this.bingoTeams.remove(team);
 	}
 }

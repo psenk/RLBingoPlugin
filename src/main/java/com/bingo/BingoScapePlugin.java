@@ -1,5 +1,7 @@
 package com.bingo;
 
+import com.bingo.bingo.BingoBoard;
+import com.bingo.bingo.BingoGame;
 import com.bingo.io.Token;
 import com.bingo.panels.ActiveBingoPanel;
 import com.bingo.panels.BingoScapePluginPanel;
@@ -8,6 +10,8 @@ import com.bingo.panels.MainBingoPanel;
 import com.bingo.panels.ModifyBingoPanel;
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -197,9 +201,11 @@ public class BingoScapePlugin extends Plugin
 		}
 	}
 
-	public void createNewBingo()
+	public void createNewBingo(BingoGame game)
 	{
-		modifyBingoPanel.setNewBingo(true);
+		modifyBingoPanel.setIsNewBingo(true);
+		modifyBingoPanel.setBingoGame(game);
+		modifyBingoPanel.displayBoards();
 		this.panelSelector(BingoConfig.Panel.MODIFY);
 	}
 }

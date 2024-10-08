@@ -14,18 +14,39 @@ public class BingoBoard extends JPanel
 
 	@Getter
 	@Setter
-	private String boardTitle;
+	private String boardName;
 
+	@Getter
+	@Setter
+	private String boardDescription;
+
+	@Getter
+	@Setter
+	private int boardWidth;
+
+	@Getter
+	@Setter
+	private int boardHeight;
+
+	@Getter
 	private List<BingoTile> tiles;
-	private int length;
-	private int width;
 
-	public BingoBoard(int boardNumber, String boardTitle, int length, int width)
+	public BingoBoard(String boardName, String boardDescription, int boardWidth, int boardHeight)
+	{
+		this.boardName = boardName;
+		this.boardDescription = boardDescription;
+		this.boardWidth = boardWidth;
+		this.boardHeight = boardHeight;
+
+		this.tiles = new ArrayList<>();
+	}
+
+	public BingoBoard(int boardNumber, String boardDescription, int width, int length)
 	{
 		this.boardNumber = boardNumber;
-		this.boardTitle = boardTitle;
-		this.length = length;
-		this.width = width;
+		this.boardDescription = boardDescription;
+		this.boardWidth = width;
+		this.boardHeight = length;
 
 		this.tiles = new ArrayList<>();
 	}
