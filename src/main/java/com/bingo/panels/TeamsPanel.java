@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import lombok.Getter;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
@@ -31,15 +32,9 @@ public class TeamsPanel extends JPanel
 	private static final ImageIcon DELETE_ICON_HOVER;
 	private static final ImageIcon EDIT_ICON;
 	private static final ImageIcon EDIT_ICON_HOVER;
-	private static final ImageIcon ARROW_DOWN_ICON;
-	private static final ImageIcon ARROW_DOWN_ICON_HOVER;
-	private static final ImageIcon ARROW_UP_ICON;
-	private static final ImageIcon ARROW_UP_ICON_HOVER;
-
 
 	private final JPanel teamsListPanel;
-	private JButton expandButton;
-	private boolean isCollapsed;
+	private final JScrollPane teamsScrollPane;
 
 	static
 	{
@@ -54,24 +49,14 @@ public class TeamsPanel extends JPanel
 		final BufferedImage editIcon = ImageUtil.loadImageResource(MainBingoPanel.class, "/com/bingo/edit_icon.png");
 		EDIT_ICON = new ImageIcon(editIcon);
 		EDIT_ICON_HOVER = new ImageIcon(ImageUtil.luminanceOffset(editIcon, -100));
-
-		final BufferedImage arrowDownIcon = ImageUtil.loadImageResource(MainBingoPanel.class, "/com/bingo/arrow_icon.png");
-		ARROW_DOWN_ICON = new ImageIcon(arrowDownIcon);
-		ARROW_DOWN_ICON_HOVER = new ImageIcon(ImageUtil.luminanceOffset(arrowDownIcon, -100));
-
-		final BufferedImage arrowUpIcon = ImageUtil.loadImageResource(MainBingoPanel.class, "/com/bingo/arrow_icon.png");
-		ARROW_UP_ICON = new ImageIcon(ImageUtil.flipImage(arrowDownIcon, false, true));
-		ARROW_UP_ICON_HOVER = new ImageIcon(ImageUtil.luminanceOffset(arrowUpIcon, -100));
 	}
 
 	public TeamsPanel()
 	{
 		this.setLayout(new BorderLayout());
 		this.teamNames = new ArrayList<>();
-		this.isCollapsed = false;
 
-		JPanel headerPanel = new JPanel();
-		headerPanel.setLayout(new BorderLayout());
+		JPanel headerPanel = new JPanel(new BorderLayout());
 		headerPanel.setBackground(ColorScheme.CONTROL_COLOR);
 
 		JLabel headerLabel = new JLabel("Teams");
@@ -79,53 +64,22 @@ public class TeamsPanel extends JPanel
 		headerLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		headerPanel.add(headerLabel, BorderLayout.WEST);
 
-		JPanel headerButtons = new JPanel(new FlowLayout());
-
-		expandButton = new JButton(ARROW_DOWN_ICON);
-		expandButton.setBorder(BorderFactory.createEmptyBorder());
-		expandButton.setContentAreaFilled(false);
-		expandButton.addMouseListener(new MouseAdapter()
-		{
-			@Override
-			public void mouseClicked(MouseEvent e)
-			{
-				toggleTeamListVisibility();
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e)
-			{
-				if (isCollapsed)
-				{
-					expandButton.setIcon(ARROW_DOWN_ICON_HOVER);
-				}
-				else
-				{
-					expandButton.setIcon(ARROW_UP_ICON_HOVER);
-				}
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e)
-			{
-				if (isCollapsed)
-				{
-					expandButton.setIcon(ARROW_DOWN_ICON);
-				}
-				else
-				{
-					expandButton.setIcon(ARROW_DOWN_ICON);
-				}
-			}
-		});
-		expandButton.setVisible(false);
-		headerButtons.add(expandButton);
+		JPanel headerButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
 		JButton addTeamButton = new JButton(ADD_ICON);
 		addTeamButton.setBorder(BorderFactory.createEmptyBorder());
 		addTeamButton.setContentAreaFilled(false);
 		addTeamButton.addMouseListener(new MouseAdapter()
 		{
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				if (SwingUtilities.isLeftMouseButton(e))
+				{
+					addNewTeam();
+				}
+			}
+
 			@Override
 			public void mouseEntered(MouseEvent e)
 			{
@@ -137,34 +91,20 @@ public class TeamsPanel extends JPanel
 			{
 				addTeamButton.setIcon(ADD_ICON);
 			}
-
-			@Override
-			public void mouseClicked(MouseEvent e)
-			{
-				addNewTeam();
-			}
 		});
 		headerButtons.add(addTeamButton);
 
-		headerPanel.addMouseListener(new MouseAdapter()
-		{
-			@Override
-			public void mouseClicked(MouseEvent e)
-			{
-				toggleTeamListVisibility();
-			}
-		});
 		headerPanel.add(headerButtons, BorderLayout.EAST);
 		this.add(headerPanel, BorderLayout.NORTH);
 
 		teamsListPanel = new JPanel();
 		teamsListPanel.setLayout(new BoxLayout(teamsListPanel, BoxLayout.Y_AXIS));
+		teamsListPanel.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
+		teamsListPanel.setPreferredSize(new Dimension(225, 800));
 
-		JScrollPane teamsScrollPane = new JScrollPane(teamsListPanel);
-		teamsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		teamsScrollPane = new JScrollPane(teamsListPanel);
+		teamsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 		teamsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		teamsListPanel.setPreferredSize(isCollapsed ? new Dimension(0, 0) : null);
-		teamsScrollPane.setVisible(!isCollapsed);
 		this.add(teamsScrollPane, BorderLayout.CENTER);
 	}
 
@@ -191,17 +131,29 @@ public class TeamsPanel extends JPanel
 		for (String teamName : teamNames)
 		{
 			JPanel teamPanel = createTeamPanel(teamName);
+			teamPanel.setForeground(ColorScheme.TEXT_COLOR);
 			teamsListPanel.add(teamPanel);
 		}
+
+		if (teamNames.size() >= 5)
+		{
+			teamsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		}
+		else
+		{
+			teamsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+		}
+		teamsScrollPane.setVisible(!teamNames.isEmpty());
+
 		teamsListPanel.revalidate();
 		teamsListPanel.repaint();
 	}
 
 	private JPanel createTeamPanel(String teamName)
 	{
-		JPanel teamPanel = new JPanel();
-		teamPanel.setLayout(new BorderLayout());
+		JPanel teamPanel = new JPanel(new BorderLayout());
 		teamPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+		teamPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
 		teamPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 
 		JLabel teamNameLabel = new JLabel(teamName);
@@ -275,23 +227,6 @@ public class TeamsPanel extends JPanel
 		}
 	}
 
-	private void toggleTeamListVisibility()
-	{
-		expandButton.setVisible(!teamNames.isEmpty());
-
-		isCollapsed = !isCollapsed;
-		if (isCollapsed)
-		{
-			this.expandButton.setIcon(ARROW_UP_ICON);
-		}
-		else
-		{
-			this.expandButton.setIcon(ARROW_DOWN_ICON);
-		}
-		teamsListPanel.setVisible(!isCollapsed);
-		this.revalidate();
-	}
-
 	private void editTeam(String teamName)
 	{
 		String newName = JOptionPane.showInputDialog(this, "Edit Team Name:", teamName);
@@ -302,17 +237,9 @@ public class TeamsPanel extends JPanel
 				JOptionPane.showMessageDialog(this, "This team name already exists.", "Duplicate Team", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-
-			int index = teamNames.indexOf(teamName);
-			if (index != -1)
-			{
-				teamNames.set(index, newName);
-				refreshTeamList();
-			}
-			else if (newName.isEmpty())
-			{
-				JOptionPane.showMessageDialog(this, "Team name cannot be empty.", "Invalid Name", JOptionPane.ERROR_MESSAGE);
-			}
+			teamNames.remove(teamName);
+			teamNames.add(newName);
+			refreshTeamList();
 		}
 	}
 }

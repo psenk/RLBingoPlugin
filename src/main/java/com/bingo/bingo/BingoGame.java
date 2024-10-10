@@ -24,11 +24,17 @@ public class BingoGame
 	@Setter
 	public int bingoDuration;
 
+	@Setter
 	@Getter
 	public List<String> bingoTeams;
 
 	@Getter
 	public Map<Integer, BingoBoard> bingoBoards;
+
+	public BingoGame()
+	{
+
+	}
 
 	public BingoGame(int id)
 	{
@@ -46,7 +52,7 @@ public class BingoGame
 
 	public void addBingoBoard(BingoBoard board)
 	{
-		this.bingoBoards.put(bingoBoards.size(), board);
+		this.bingoBoards.put(bingoBoards.size() + 1, board);
 	}
 
 	public void removeBingoBoard(int id)

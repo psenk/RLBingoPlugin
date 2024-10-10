@@ -19,7 +19,8 @@ public interface BingoConfig extends Config
 		MAIN("", "BingoScape home screen."),
 		ACTIVE("View Active Bingo", "View the status of an active bingo event."),
 		CREATE("Create New Bingo", "Create a new bingo event."),
-		MODIFY("Modify Existing Bingo", "Modify an existing bingo event.");
+		MODIFY("Modify Existing Bingo", "Modify an existing bingo event."),
+		AUTH("Authorization Panel", "Authorization Panel");
 
 		public final String title;
 		public final String tooltip;

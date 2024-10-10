@@ -4,17 +4,22 @@ import com.bingo.BingoConfig;
 import com.bingo.BingoScapePlugin;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
@@ -49,21 +54,15 @@ public class BingoScapePluginPanel extends PluginPanel
 	public BingoScapePluginPanel(final BingoScapePlugin plugin)
 	{
 		super(false);
-
 		this.setLayout(new BorderLayout());
-		JPanel headerPanel = new JPanel(new BorderLayout());
-		this.contentPanel = new JPanel();
-		contentPanel.setVisible(true);
-		contentPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
+		JPanel headerPanel = new JPanel(new BorderLayout());
 		JLabel titleLabel = new JLabel(TITLE);
-		titleLabel.setForeground(Color.WHITE);
-		titleLabel.setBorder(new EmptyBorder(10, 10, 5, 0));
-		headerPanel.add(Box.createHorizontalStrut(10));
+		titleLabel.setForeground(ColorScheme.TEXT_COLOR);
+		titleLabel.setBorder(new EmptyBorder(10, 10, 10, 0));
 		headerPanel.add(titleLabel, BorderLayout.WEST);
 
 		this.githubButton = new JLabel(GITHUB_ICON);
-		githubButton.setVisible(true);
 		githubButton.setToolTipText(GITHUB_LINK);
 		githubButton.addMouseListener(new MouseAdapter()
 		{
@@ -116,18 +115,16 @@ public class BingoScapePluginPanel extends PluginPanel
 			}
 		});
 
-
-		JPanel headerButtons = new JPanel();
-		headerButtons.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 5));
+		JPanel headerButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
 		headerButtons.add(homeButton);
 		headerButtons.add(githubButton);
 
 		headerPanel.add(headerButtons, BorderLayout.EAST);
-
 		this.add(headerPanel, BorderLayout.NORTH);
+
+		this.contentPanel = new JPanel();
+		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 		this.add(contentPanel, BorderLayout.CENTER);
-		this.revalidate();
-		this.repaint();
 	}
 
 	public void updateHomeButton(boolean onMainPage)
@@ -135,8 +132,11 @@ public class BingoScapePluginPanel extends PluginPanel
 		homeButton.setVisible(!onMainPage);
 	}
 
-	public <T extends PluginPanel> void addPanel(PluginPanel p)
+	public <T extends JPanel> void addPanel(JPanel p)
 	{
-		this.contentPanel.add(p, BorderLayout.CENTER);
+		this.contentPanel.add(p);
+		this.contentPanel.add(Box.createVerticalGlue());
+		this.revalidate();
+		this.repaint();
 	}
 }

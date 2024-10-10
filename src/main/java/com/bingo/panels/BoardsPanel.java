@@ -21,6 +21,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import lombok.Getter;
+import lombok.Setter;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.components.FlatTextField;
 import net.runelite.client.util.ImageUtil;
@@ -28,7 +30,10 @@ import net.runelite.client.util.ImageUtil;
 public class BoardsPanel extends JPanel
 {
 	// TODO: add total tiles panel
+	@Setter
+	private BoardListener boardListener;
 
+	@Getter
 	public List<BingoBoard> boards;
 
 	private static final ImageIcon ADD_ICON;
@@ -37,18 +42,13 @@ public class BoardsPanel extends JPanel
 	private static final ImageIcon DELETE_ICON_HOVER;
 	private static final ImageIcon EDIT_ICON;
 	private static final ImageIcon EDIT_ICON_HOVER;
-	private static final ImageIcon ARROW_DOWN_ICON;
-	private static final ImageIcon ARROW_DOWN_ICON_HOVER;
-	private static final ImageIcon ARROW_UP_ICON;
-	private static final ImageIcon ARROW_UP_ICON_HOVER;
 
 	private final JPanel boardsListPanel;
 	private final JPanel boardCustomizationPanel;
 	private JButton createButton;
-	private JButton expandButton;
-	private boolean isCollapsed;
 	private boolean isCustomizationPanelVisible;
-	private BingoBoard edittingBoard;
+	private JScrollPane boardsScrollPane;
+	private BingoBoard editingBoard;
 
 	private FlatTextField boardName;
 	private FlatTextField boardDescription;
@@ -68,14 +68,6 @@ public class BoardsPanel extends JPanel
 		final BufferedImage editIcon = ImageUtil.loadImageResource(MainBingoPanel.class, "/com/bingo/edit_icon.png");
 		EDIT_ICON = new ImageIcon(editIcon);
 		EDIT_ICON_HOVER = new ImageIcon(ImageUtil.luminanceOffset(editIcon, -100));
-
-		final BufferedImage arrowDownIcon = ImageUtil.loadImageResource(MainBingoPanel.class, "/com/bingo/arrow_icon.png");
-		ARROW_DOWN_ICON = new ImageIcon(arrowDownIcon);
-		ARROW_DOWN_ICON_HOVER = new ImageIcon(ImageUtil.luminanceOffset(arrowDownIcon, -100));
-
-		final BufferedImage arrowUpIcon = ImageUtil.loadImageResource(MainBingoPanel.class, "/com/bingo/arrow_icon.png");
-		ARROW_UP_ICON = new ImageIcon(ImageUtil.flipImage(arrowDownIcon, false, true));
-		ARROW_UP_ICON_HOVER = new ImageIcon(ImageUtil.luminanceOffset(arrowUpIcon, -100));
 	}
 
 	public BoardsPanel()
@@ -83,7 +75,6 @@ public class BoardsPanel extends JPanel
 		this.setLayout(new BorderLayout());
 		this.boards = new ArrayList<>();
 		this.isCustomizationPanelVisible = false;
-		this.isCollapsed = false;
 
 		JPanel headerPanel = new JPanel(new BorderLayout());
 		headerPanel.setBackground(ColorScheme.CONTROL_COLOR);
@@ -95,94 +86,54 @@ public class BoardsPanel extends JPanel
 
 		JPanel headerButtons = new JPanel(new FlowLayout());
 
-		expandButton = new JButton(ARROW_DOWN_ICON);
-		expandButton.setBorder(BorderFactory.createEmptyBorder());
-		expandButton.setContentAreaFilled(false);
-		expandButton.addMouseListener(new MouseAdapter()
+		JButton addBoardButton = new JButton(ADD_ICON);
+		addBoardButton.setBorder(BorderFactory.createEmptyBorder());
+		addBoardButton.setContentAreaFilled(false);
+		addBoardButton.addMouseListener(new MouseAdapter()
 		{
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{
-				toggleBoardListVisibility();
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e)
-			{
-				if (isCollapsed)
-				{
-					expandButton.setIcon(ARROW_DOWN_ICON_HOVER);
-				}
-				else
-				{
-					expandButton.setIcon(ARROW_UP_ICON_HOVER);
-				}
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e)
-			{
-				if (isCollapsed)
-				{
-					expandButton.setIcon(ARROW_DOWN_ICON);
-				}
-				else
-				{
-					expandButton.setIcon(ARROW_UP_ICON);
-				}
-			}
-		});
-		expandButton.setVisible(false);
-		headerButtons.add(expandButton);
-
-		JButton addButton = new JButton(ADD_ICON);
-		addButton.setBorder(BorderFactory.createEmptyBorder());
-		addButton.setContentAreaFilled(false);
-		addButton.addMouseListener(new MouseAdapter()
-		{
-			@Override
-			public void mouseReleased(MouseEvent e)
-			{
 				if (SwingUtilities.isLeftMouseButton(e))
 				{
-					toggleCustomizationPanelVisibility();
+					toggleCustomizationPanelVisibility(true);
 				}
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e)
 			{
-				addButton.setIcon(ADD_ICON_HOVER);
+				addBoardButton.setIcon(ADD_ICON_HOVER);
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e)
 			{
-				addButton.setIcon(ADD_ICON);
+				addBoardButton.setIcon(ADD_ICON);
 			}
 		});
-		headerButtons.add(addButton);
+		headerButtons.add(addBoardButton);
 
 		headerPanel.add(headerButtons, BorderLayout.EAST);
 		this.add(headerPanel, BorderLayout.NORTH);
 
 		boardsListPanel = new JPanel();
 		boardsListPanel.setLayout(new BoxLayout(boardsListPanel, BoxLayout.Y_AXIS));
+		boardsListPanel.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
 
-		JScrollPane boardsScrollPane = new JScrollPane(boardsListPanel);
-		boardsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		boardsScrollPane = new JScrollPane(boardsListPanel);
+		boardsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 		boardsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		boardsScrollPane.setPreferredSize(new Dimension(Integer.MAX_VALUE, 800));
 		this.add(boardsScrollPane, BorderLayout.CENTER);
 
 		boardCustomizationPanel = createBoardCustomizationPanel();
-		boardCustomizationPanel.setVisible(false);
 		boardsListPanel.add(boardCustomizationPanel);
 	}
 
 	private JPanel createBoardCustomizationPanel()
 	{
 		JPanel customizationPanel = new JPanel(new GridLayout(5, 2, 10, 10));
-
 		customizationPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		customizationPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -205,9 +156,9 @@ public class BoardsPanel extends JPanel
 		customizationPanel.add(createButton);
 
 		JButton cancelButton = new JButton("Cancel");
-		cancelButton.addActionListener(e -> toggleCustomizationPanelVisibility());
+		cancelButton.addActionListener(e -> toggleCustomizationPanelVisibility(false));
 		customizationPanel.add(cancelButton);
-
+		customizationPanel.setVisible(false);
 		return customizationPanel;
 	}
 
@@ -224,20 +175,27 @@ public class BoardsPanel extends JPanel
 			return;
 		}
 
-		if (this.edittingBoard != null)
+		if (this.editingBoard != null)
 		{
-			edittingBoard.setBoardName(newBoardName);
-			edittingBoard.setBoardDescription(newBoardDescription);
-			edittingBoard.setBoardWidth(newBoardWidth);
-			edittingBoard.setBoardHeight(newBoardHeight);
+			editingBoard.setBoardName(newBoardName);
+			editingBoard.setBoardDescription(newBoardDescription);
+			editingBoard.setBoardWidth(newBoardWidth);
+			editingBoard.setBoardHeight(newBoardHeight);
 		}
 		else
 		{
-			boards.add(new BingoBoard(getBoardName(), getBoardDescription(), getBoardWidth(), getBoardHeight()));
+			BingoBoard board = new BingoBoard(getBoardName(), getBoardDescription(), getBoardWidth(), getBoardHeight());
+			boards.add(board);
+
+			if (boardListener != null)
+			{
+				boardListener.onBoardAdded(board);
+			}
 		}
+
 		refreshBoardList();
 		resetCustomizationFields();
-		toggleCustomizationPanelVisibility();
+		toggleCustomizationPanelVisibility(false);
 	}
 
 	private void refreshBoardList()
@@ -248,8 +206,20 @@ public class BoardsPanel extends JPanel
 		for (BingoBoard board : boards)
 		{
 			JPanel boardPanel = createBoardPanel(board);
+			boardPanel.setForeground(ColorScheme.TEXT_COLOR);
 			boardsListPanel.add(boardPanel);
 		}
+
+		if (boards.size() >= 5)
+		{
+			boardsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		}
+		else
+		{
+			boardsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+		}
+
+		boardsScrollPane.setVisible(!boards.isEmpty());
 
 		boardsListPanel.revalidate();
 		boardsListPanel.repaint();
@@ -261,13 +231,14 @@ public class BoardsPanel extends JPanel
 		boardDescription.setText("");
 		boardWidth.setValue(1);
 		boardHeight.setValue(1);
-		edittingBoard = null;
+		editingBoard = null;
 	}
 
 	private JPanel createBoardPanel(BingoBoard board)
 	{
 		JPanel boardPanel = new JPanel(new BorderLayout());
 		boardPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+		boardPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
 		boardPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 
 		JLabel boardNameLabel = new JLabel(board.getBoardName());
@@ -282,6 +253,12 @@ public class BoardsPanel extends JPanel
 		editButton.addMouseListener(new MouseAdapter()
 		{
 			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				editBoard(board);
+			}
+
+			@Override
 			public void mouseEntered(MouseEvent e)
 			{
 				editButton.setIcon(EDIT_ICON_HOVER);
@@ -292,12 +269,6 @@ public class BoardsPanel extends JPanel
 			{
 				editButton.setIcon(EDIT_ICON);
 			}
-
-			@Override
-			public void mouseClicked(MouseEvent e)
-			{
-				editBoard(board);
-			}
 		});
 		panelButtons.add(editButton);
 
@@ -306,6 +277,12 @@ public class BoardsPanel extends JPanel
 		deleteButton.setContentAreaFilled(false);
 		deleteButton.addMouseListener(new MouseAdapter()
 		{
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				deleteBoard(board);
+			}
+
 			@Override
 			public void mouseEntered(MouseEvent e)
 			{
@@ -317,15 +294,14 @@ public class BoardsPanel extends JPanel
 			{
 				deleteButton.setIcon(DELETE_ICON);
 			}
-
-			@Override
-			public void mouseClicked(MouseEvent e)
-			{
-				deleteBoard(board);
-			}
 		});
 		panelButtons.add(deleteButton);
+
 		boardPanel.add(panelButtons, BorderLayout.EAST);
+		if (boardListener != null)
+		{
+			boardListener.onBoardAdded(board);
+		}
 
 		return boardPanel;
 	}
@@ -336,35 +312,24 @@ public class BoardsPanel extends JPanel
 
 		if (confirm == JOptionPane.YES_OPTION)
 		{
+			if (boardListener != null) {
+				boardListener.onBoardRemoved(board);
+			}
 			boards.remove(board);
 			refreshBoardList();
 		}
 	}
 
-	private void toggleCustomizationPanelVisibility()
+	private void toggleCustomizationPanelVisibility(boolean visible)
 	{
-		isCustomizationPanelVisible = !isCustomizationPanelVisible;
+		isCustomizationPanelVisible = visible;
 		boardCustomizationPanel.setVisible(isCustomizationPanelVisible);
-		this.revalidate();
-		this.repaint();
-	}
-
-	private void toggleBoardListVisibility()
-	{
-
-		expandButton.setVisible(!boards.isEmpty());
-
-		isCollapsed = !isCollapsed;
-		if (isCollapsed)
+		if (isCustomizationPanelVisible)
 		{
-			this.expandButton.setIcon(ARROW_UP_ICON);
+			boardsListPanel.remove(boardCustomizationPanel);
+			boardsListPanel.add(boardCustomizationPanel, 0);
 		}
-		else
-		{
-			this.expandButton.setIcon(ARROW_DOWN_ICON);
-		}
-		this.revalidate();
-		this.repaint();
+		refreshBoardList();
 	}
 
 	private String getBoardName()
@@ -389,7 +354,7 @@ public class BoardsPanel extends JPanel
 
 	private void editBoard(BingoBoard board)
 	{
-		edittingBoard = board;
+		this.editingBoard = board;
 		boardName.setText(board.getBoardName());
 		boardDescription.setText(board.getBoardDescription());
 		boardWidth.setValue(board.getBoardWidth());
@@ -399,7 +364,7 @@ public class BoardsPanel extends JPanel
 
 		if (!isCustomizationPanelVisible)
 		{
-			toggleCustomizationPanelVisibility();
+			toggleCustomizationPanelVisibility(true);
 		}
 	}
 }

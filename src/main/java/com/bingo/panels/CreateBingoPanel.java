@@ -4,152 +4,147 @@ import com.bingo.BingoConfig;
 import com.bingo.BingoScapePlugin;
 import com.bingo.bingo.BingoBoard;
 import com.bingo.bingo.BingoGame;
-import com.bingo.io.LogIn;
-import com.bingo.io.Token;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 import lombok.Getter;
 import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
-import net.runelite.client.ui.components.FlatTextField;
 
 @ConfigGroup("bingo")
 public class CreateBingoPanel extends PluginPanel
 {
 	public BingoConfig.Panel id = BingoConfig.Panel.CREATE;
+	private final BingoScapePlugin plugin;
 
-	private final FlatTextField bingoName;
-	private final FlatTextField bingoDescription;
-	private final JSpinner bingoDuration;
+	private final JPanel mainPanel;
+	private final CardLayout cardLayout;
+	private final BasicInfoPanel basicInfoPanel;
+	private final TileSelectorPanel tileSelectorPanel;
+	private final ConfirmPanel confirmPanel;
 
 	@Getter
 	private List<String> bingoTeams = new ArrayList<>();
-
 	@Getter
 	private Map<Integer, BingoBoard> bingoBoards = new HashMap<>();
-
-	private final BingoScapePlugin plugin;
+	private BingoGame activeGame;
 
 	public CreateBingoPanel(final BingoScapePlugin plugin)
 	{
 		super(false);
 		this.plugin = plugin;
+		this.activeGame = new BingoGame();
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-		JPanel basicInfoPanel = new JPanel();
-		basicInfoPanel.setLayout(new BoxLayout(basicInfoPanel, BoxLayout.Y_AXIS));
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+		JButton basicInfoButton = new JButton("Info");
+		JButton taskSelectorButton = new JButton("Tasks");
+		JButton confirmButton = new JButton("Final");
 
-		JLabel bingoNameLabel = new JLabel("Bingo Name:");
-		bingoNameLabel.setAlignmentX(LEFT_ALIGNMENT);
-		basicInfoPanel.add(bingoNameLabel);
+		basicInfoButton.setPreferredSize(new Dimension(65, 20));
+		taskSelectorButton.setPreferredSize(new Dimension(65, 20));
+		confirmButton.setPreferredSize(new Dimension(65, 20));
 
-		bingoName = new FlatTextField();
-		bingoName.setPreferredSize(new Dimension(200, 20));
-		bingoName.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
-		bingoName.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR));
-		basicInfoPanel.add(bingoName);
-		basicInfoPanel.add(Box.createVerticalStrut(10));
+		buttonPanel.add(basicInfoButton);
+		buttonPanel.add(taskSelectorButton);
+		buttonPanel.add(confirmButton);
 
-		JLabel bingoDescriptionLabel = new JLabel("Bingo Description:");
-		bingoDescriptionLabel.setAlignmentX(LEFT_ALIGNMENT);
-		basicInfoPanel.add(bingoDescriptionLabel);
+		this.add(buttonPanel);
+		this.add(Box.createRigidArea(new Dimension(0, 10)));
 
-		bingoDescription = new FlatTextField();
-		bingoDescription.setPreferredSize(new Dimension(200, 20));
-		bingoDescription.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
-		bingoDescription.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR));
-		basicInfoPanel.add(bingoDescription);
-		basicInfoPanel.add(Box.createVerticalStrut(10));
+		cardLayout = new CardLayout();
+		mainPanel = new JPanel(cardLayout);
+		mainPanel.setPreferredSize(new Dimension(225, 0));
+		this.add(mainPanel);
 
-		JLabel bingoDurationLabel = new JLabel("Bingo Duration (in days):");
-		bingoDurationLabel.setAlignmentX(LEFT_ALIGNMENT);
-		basicInfoPanel.add(bingoDurationLabel);
+		basicInfoPanel = new BasicInfoPanel(activeGame);
+		tileSelectorPanel = new TileSelectorPanel(activeGame);
+		confirmPanel = new ConfirmPanel(activeGame);
 
-		bingoDuration = new JSpinner();
-		bingoDuration.setPreferredSize(new Dimension(100, 20));
-		bingoDuration.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
-		bingoDuration.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR));
-		basicInfoPanel.add(bingoDuration);
+		mainPanel.add(basicInfoPanel, "BasicInfoPanel");
+		mainPanel.add(tileSelectorPanel, "TileSelectorPanel");
+		mainPanel.add(confirmPanel, "ConfirmPanel");
 
-		this.add(basicInfoPanel);
-		this.add(Box.createVerticalStrut(10));
+		cardLayout.show(mainPanel, "BasicInfoPanel");
 
-		TeamsPanel teamsPanel = new TeamsPanel();
-		this.add(teamsPanel);
-		this.add(Box.createVerticalStrut(10));
-
-		BoardsPanel boardsPanel = new BoardsPanel();
-		this.add(boardsPanel);
-		this.add(Box.createVerticalStrut(10));
-
-		JLabel setTilesButton = new JLabel("Select Tasks");
-		setTilesButton.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR));
-		setTilesButton.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		setTilesButton.addMouseListener(new MouseAdapter()
+		basicInfoButton.addMouseListener(new MouseAdapter()
 		{
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{
-				if (SwingUtilities.isLeftMouseButton(e))
-				{
-					bingoTeams = teamsPanel.getTeamNames();
-					for (BingoBoard b : boardsPanel.boards)
-					{
-						bingoBoards.put(bingoBoards.size() + 1, b);
-					}
-					BingoGame game = new BingoGame(getBingoName(), getBingoDescription(), getBingoDuration(), getBingoTeams(), getBingoBoards());
-					plugin.createNewBingo(game);
-					setTilesButton.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-				}
+				cardLayout.show(mainPanel, "BasicInfoPanel");
+			}
+		});
+
+		taskSelectorButton.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				cardLayout.show(mainPanel, "TileSelectorPanel");
+			}
+		});
+
+		confirmButton.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				cardLayout.show(mainPanel, "ConfirmPanel");
+			}
+		});
+
+		JButton generateButton = new JButton("Generate Bingo");
+		generateButton.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseExited(MouseEvent e)
+			{
+
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e)
 			{
-				setTilesButton.setBackground(ColorScheme.DARK_GRAY_COLOR);
-				setTilesButton.setBorder(BorderFactory.createLineBorder(ColorScheme.MEDIUM_GRAY_COLOR));
+
 			}
 
 			@Override
-			public void mouseExited(MouseEvent e)
+			public void mouseClicked(MouseEvent e)
 			{
-				setTilesButton.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR));
-				setTilesButton.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+				generateBingo();
 			}
 		});
 
-		JPanel setTilesPanel = new JPanel();
-		setTilesPanel.add(setTilesButton);
-		this.add(setTilesButton, BorderLayout.SOUTH);
+		JPanel generateButtonPanel = new JPanel(new BorderLayout());
+		generateButtonPanel.add(generateButton, BorderLayout.SOUTH);
+
+		this.add(generateButtonPanel);
 	}
 
-	public String getBingoName()
+	private void generateBingo()
 	{
-		return bingoName.getText();
-	}
+		activeGame.setBingoTitle(basicInfoPanel.getBingoName());
+		activeGame.setBingoDescription(basicInfoPanel.getBingoDescription());
+		activeGame.setBingoDuration(basicInfoPanel.getBingoDuration());
+		activeGame.setBingoTeams(basicInfoPanel.getBingoTeams());
 
-	public String getBingoDescription()
-	{
-		return bingoDescription.getText();
-	}
-
-	public int getBingoDuration()
-	{
-		return (int) bingoDuration.getValue();
+		for (BingoBoard board : basicInfoPanel.getBingoBoards())
+		{
+			activeGame.addBingoBoard(board);
+		}
 	}
 }

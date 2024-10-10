@@ -2,52 +2,51 @@ package com.bingo.panels;
 
 import com.bingo.BingoConfig;
 import com.bingo.BingoScapePlugin;
-import javax.inject.Inject;
+import com.bingo.io.Token;
+import com.bingo.io.TokenManager;
+import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigManager;
 import net.runelite.client.ui.PluginPanel;
 
 @ConfigGroup("bingo")
 public class ActiveBingoPanel extends PluginPanel
 {
 	public BingoConfig.Panel id = BingoConfig.Panel.ACTIVE;
-
-	@Inject
-	private ConfigManager configManager;
+	protected final BingoScapePlugin plugin;
+	private final TokenManager tokenManager;
 
 	private final AuthPanel authPanel;
 	private final JPanel teamPanel;
 
-	protected final BingoScapePlugin plugin;
-
 	// TODO: icons?
 	// TODO: enums: bosses, actions/tasks
 
-	public ActiveBingoPanel(final BingoScapePlugin plugin)
+	public ActiveBingoPanel(final BingoScapePlugin plugin, TokenManager tokenManager)
 	{
 		super(false);
 		this.plugin = plugin;
+		this.tokenManager = tokenManager;
+		this.setLayout(new BorderLayout());
 
 		JPanel headerPanel = new JPanel();
-		headerPanel.setVisible(true);
-
-		// auth panel
-		authPanel = new AuthPanel(this);
+		authPanel = new AuthPanel(plugin, BingoConfig.Panel.ACTIVE);
+		authPanel.unhideAdminPanel(false);
 		headerPanel.add(authPanel);
 
 		// TODO: await?
-		// team panel
 		teamPanel = new JPanel();
 		teamPanel.setVisible(false);
+		headerPanel.add(teamPanel);
 
-		this.add(headerPanel);
+		this.add(headerPanel, BorderLayout.NORTH);
 		this.updatePanelVisibility();
 	}
 
 	public void updatePanelVisibility()
 	{
-		if (plugin.getActiveToken().getId() != 0) // TODO: isValidToken()?
+		Token t = tokenManager.getActiveToken();
+		if (tokenManager.isValidToken(t))
 		{
 			authPanel.setVisible(false);
 			teamPanel.setVisible(true);
@@ -55,5 +54,14 @@ public class ActiveBingoPanel extends PluginPanel
 		}
 		authPanel.setVisible(true);
 		teamPanel.setVisible(false);
+	}
+
+	public void handleSuccessfulLogin()
+	{
+
+		authPanel.setVisible(false);
+		teamPanel.setVisible(true);
+		this.revalidate();
+		this.repaint();
 	}
 }

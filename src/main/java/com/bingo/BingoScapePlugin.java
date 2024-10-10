@@ -1,17 +1,14 @@
 package com.bingo;
 
-import com.bingo.bingo.BingoBoard;
-import com.bingo.bingo.BingoGame;
-import com.bingo.io.Token;
+import com.bingo.io.TokenManager;
 import com.bingo.panels.ActiveBingoPanel;
 import com.bingo.panels.BingoScapePluginPanel;
 import com.bingo.panels.CreateBingoPanel;
 import com.bingo.panels.MainBingoPanel;
 import com.bingo.panels.ModifyBingoPanel;
+import com.google.gson.Gson;
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
-import java.util.List;
-import java.util.Map;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +24,6 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
-import com.google.gson.Gson;
 
 // TODO:
 
@@ -52,11 +48,17 @@ public class BingoScapePlugin extends Plugin
 	@Inject
 	private ConfigManager configManager;
 
+	private TokenManager tokenManager;
 	private BingoScapePluginPanel bingoScapePluginPanel;
 	private MainBingoPanel mainBingoPanel;
+
+	@Getter
 	private ActiveBingoPanel activeBingoPanel;
 	private CreateBingoPanel createBingoPanel;
+
+	@Getter
 	private ModifyBingoPanel modifyBingoPanel;
+
 	private NavigationButton navigationButton;
 
 	private final Gson gson = new Gson();
@@ -65,12 +67,14 @@ public class BingoScapePlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		//log.info("Example started!");
-		destroyToken();
+		this.tokenManager = new TokenManager(configManager);
+		tokenManager.destroyToken();
+
 		this.bingoScapePluginPanel = new BingoScapePluginPanel(this);
-		this.mainBingoPanel = new MainBingoPanel(this);
-		this.activeBingoPanel = new ActiveBingoPanel(this);
+		this.mainBingoPanel = new MainBingoPanel(this, tokenManager);
+		this.activeBingoPanel = new ActiveBingoPanel(this, tokenManager);
 		this.createBingoPanel = new CreateBingoPanel(this);
-		this.modifyBingoPanel = new ModifyBingoPanel(this);
+		this.modifyBingoPanel = new ModifyBingoPanel(this, tokenManager);
 
 		bingoScapePluginPanel.addPanel(mainBingoPanel);
 		bingoScapePluginPanel.addPanel(activeBingoPanel);
@@ -142,6 +146,7 @@ public class BingoScapePlugin extends Plugin
 				setActivePanel(modifyBingoPanel);
 				setActiveConfigPanel(BingoConfig.Panel.MODIFY);
 				break;
+
 		}
 		bingoScapePluginPanel.updateHomeButton(this.onMainPage);
 	}
@@ -151,7 +156,7 @@ public class BingoScapePlugin extends Plugin
 	{
 		//log.info("Example stopped!");
 		// TODO: do i need to log out of something here?
-		destroyToken();
+		tokenManager.destroyToken();
 		clientToolbar.removeNavigation(navigationButton);
 	}
 
@@ -173,39 +178,5 @@ public class BingoScapePlugin extends Plugin
 	public void setActiveConfigPanel(BingoConfig.Panel p)
 	{
 		configManager.setConfiguration("bingo", "activePanel", p);
-	}
-
-	public void setActiveToken(Token t)
-	{
-		String tokenJson = gson.toJson(t);
-		configManager.setConfiguration("bingo", "activeToken", tokenJson);
-	}
-
-	public Token getActiveToken()
-	{
-		String configValue = configManager.getConfiguration("bingo", "activeToken");
-		if (configValue == null)
-		{
-			return null;
-		}
-		return gson.fromJson(configValue, Token.class);
-	}
-
-	public void destroyToken()
-	{
-		if (getActiveToken().getId() != 0)
-		{
-			Token blankToken = new Token(0);
-			String blankTokenJson = gson.toJson(blankToken);
-			configManager.setConfiguration("bingo", "activeToken", blankTokenJson);
-		}
-	}
-
-	public void createNewBingo(BingoGame game)
-	{
-		modifyBingoPanel.setIsNewBingo(true);
-		modifyBingoPanel.setBingoGame(game);
-		modifyBingoPanel.displayBoards();
-		this.panelSelector(BingoConfig.Panel.MODIFY);
 	}
 }
