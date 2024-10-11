@@ -2,7 +2,6 @@ package com.bingo.panels;
 
 import com.bingo.BingoConfig;
 import com.bingo.BingoScapePlugin;
-import com.bingo.bingo.BingoBoard;
 import com.bingo.bingo.BingoGame;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -10,16 +9,11 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import lombok.Getter;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.ui.PluginPanel;
 
@@ -28,31 +22,25 @@ public class CreateBingoPanel extends PluginPanel
 {
 	public BingoConfig.Panel id = BingoConfig.Panel.CREATE;
 	private final BingoScapePlugin plugin;
+	private BingoGame activeGame;
 
 	private final JPanel mainPanel;
 	private final CardLayout cardLayout;
-	private final BasicInfoPanel basicInfoPanel;
 	private final TileSelectorPanel tileSelectorPanel;
-	private final ConfirmPanel confirmPanel;
-
-	@Getter
-	private List<String> bingoTeams = new ArrayList<>();
-	@Getter
-	private Map<Integer, BingoBoard> bingoBoards = new HashMap<>();
-	private BingoGame activeGame;
 
 	public CreateBingoPanel(final BingoScapePlugin plugin)
 	{
 		super(false);
 		this.plugin = plugin;
 		this.activeGame = new BingoGame();
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		this.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setBorder(new EmptyBorder(10, 10, 10, 10));
 
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
 		JButton basicInfoButton = new JButton("Info");
 		JButton taskSelectorButton = new JButton("Tasks");
-		JButton confirmButton = new JButton("Final");
+		JButton confirmButton = new JButton("View");
 
 		basicInfoButton.setPreferredSize(new Dimension(65, 20));
 		taskSelectorButton.setPreferredSize(new Dimension(65, 20));
@@ -62,17 +50,18 @@ public class CreateBingoPanel extends PluginPanel
 		buttonPanel.add(taskSelectorButton);
 		buttonPanel.add(confirmButton);
 
-		this.add(buttonPanel);
-		this.add(Box.createRigidArea(new Dimension(0, 10)));
+		add(buttonPanel);
+		add(Box.createRigidArea(new Dimension(0, 10)));
 
 		cardLayout = new CardLayout();
 		mainPanel = new JPanel(cardLayout);
-		mainPanel.setPreferredSize(new Dimension(225, 0));
-		this.add(mainPanel);
+		mainPanel.setPreferredSize(new Dimension(225, 400));
+		add(mainPanel);
+		add(Box.createRigidArea(new Dimension(0, 10)));
 
-		basicInfoPanel = new BasicInfoPanel(activeGame);
 		tileSelectorPanel = new TileSelectorPanel(activeGame);
-		confirmPanel = new ConfirmPanel(activeGame);
+		BasicInfoPanel basicInfoPanel = new BasicInfoPanel(activeGame);
+		ConfirmPanel confirmPanel = new ConfirmPanel(activeGame);
 
 		mainPanel.add(basicInfoPanel, "BasicInfoPanel");
 		mainPanel.add(tileSelectorPanel, "TileSelectorPanel");
@@ -95,6 +84,7 @@ public class CreateBingoPanel extends PluginPanel
 			public void mouseClicked(MouseEvent e)
 			{
 				cardLayout.show(mainPanel, "TileSelectorPanel");
+				addNewBoards();
 			}
 		});
 
@@ -111,9 +101,9 @@ public class CreateBingoPanel extends PluginPanel
 		generateButton.addMouseListener(new MouseAdapter()
 		{
 			@Override
-			public void mouseExited(MouseEvent e)
+			public void mouseClicked(MouseEvent e)
 			{
-
+				generateBingo();
 			}
 
 			@Override
@@ -123,28 +113,27 @@ public class CreateBingoPanel extends PluginPanel
 			}
 
 			@Override
-			public void mouseClicked(MouseEvent e)
+			public void mouseExited(MouseEvent e)
 			{
-				generateBingo();
+
 			}
 		});
 
 		JPanel generateButtonPanel = new JPanel(new BorderLayout());
 		generateButtonPanel.add(generateButton, BorderLayout.SOUTH);
 
-		this.add(generateButtonPanel);
+		add(generateButtonPanel);
+	}
+
+	public void addNewBoards()
+	{
+		this.tileSelectorPanel.revalidate();
+		this.tileSelectorPanel.repaint();
 	}
 
 	private void generateBingo()
 	{
-		activeGame.setBingoTitle(basicInfoPanel.getBingoName());
-		activeGame.setBingoDescription(basicInfoPanel.getBingoDescription());
-		activeGame.setBingoDuration(basicInfoPanel.getBingoDuration());
-		activeGame.setBingoTeams(basicInfoPanel.getBingoTeams());
-
-		for (BingoBoard board : basicInfoPanel.getBingoBoards())
-		{
-			activeGame.addBingoBoard(board);
-		}
+		// code to ship bingo off
+		// activeGame -> space
 	}
 }

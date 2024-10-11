@@ -12,6 +12,12 @@ public class LogIn
 	public static Token getSessionToken(String connectionString, String password)
 	{
 		// connection mumbo jumbo
-		return new Token();
+		return new Token(1, "ACTIVE");
+	}
+
+	public static Token getSessionToken(String connectionString, String password, String adminPassword)
+	{
+		// connection mumbo jumbo
+		return new Token(1, "MODIFY");
 	}
 }

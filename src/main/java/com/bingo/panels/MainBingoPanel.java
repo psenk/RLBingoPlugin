@@ -6,13 +6,13 @@ import com.bingo.io.TokenManager;
 import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
@@ -56,21 +56,12 @@ public class MainBingoPanel extends PluginPanel
 		button.add(new JLabel(panel.title));
 		button.setVisible(true);
 		button.setToolTipText(panel.tooltip);
-		button.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR));
 		button.setBackground(ColorScheme.CONTROL_COLOR);
+		button.setBorder(new LineBorder(ColorScheme.BORDER_COLOR));
 		button.addMouseListener(new MouseAdapter()
 		{
 			@Override
-			public void mousePressed(MouseEvent e)
-			{
-				if (SwingUtilities.isLeftMouseButton(e))
-				{
-					button.setBackground(ColorScheme.DARK_GRAY_COLOR);
-				}
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e)
+			public void mouseClicked(MouseEvent e)
 			{
 				if (SwingUtilities.isLeftMouseButton(e))
 				{
@@ -82,8 +73,6 @@ public class MainBingoPanel extends PluginPanel
 					{
 						plugin.panelSelector(panel);
 					}
-					button.setBorder(BorderFactory.createLineBorder(ColorScheme.MEDIUM_GRAY_COLOR));
-					button.setBackground(ColorScheme.CONTROL_COLOR);
 				}
 			}
 
@@ -91,14 +80,14 @@ public class MainBingoPanel extends PluginPanel
 			public void mouseEntered(MouseEvent e)
 			{
 				button.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
-				button.setBorder(BorderFactory.createLineBorder(ColorScheme.MEDIUM_GRAY_COLOR));
+				button.setBorder(new LineBorder(ColorScheme.MEDIUM_GRAY_COLOR));
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e)
 			{
-				button.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR));
 				button.setBackground(ColorScheme.CONTROL_COLOR);
+				button.setBorder(new LineBorder(ColorScheme.BORDER_COLOR));
 			}
 		});
 		return button;

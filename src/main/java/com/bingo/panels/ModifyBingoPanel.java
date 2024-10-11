@@ -3,6 +3,7 @@ package com.bingo.panels;
 import com.bingo.BingoConfig;
 import com.bingo.BingoScapePlugin;
 import com.bingo.bingo.BingoGame;
+import com.bingo.io.Token;
 import com.bingo.io.TokenManager;
 import java.awt.BorderLayout;
 import java.awt.image.BufferedImage;
@@ -50,14 +51,27 @@ public class ModifyBingoPanel extends PluginPanel
 		this.setLayout(new BorderLayout());
 
 		JPanel headerPanel = new JPanel();
-		authPanel = new AuthPanel(plugin, BingoConfig.Panel.MODIFY);
-		authPanel.unhideAdminPanel(true);
+		authPanel = new AuthPanel(plugin, tokenManager, BingoConfig.Panel.MODIFY);
+		authPanel.showAdminPanel(true);
 		headerPanel.add(authPanel);
 		this.add(headerPanel, BorderLayout.NORTH);
 
 		contentPanel = new JPanel();
 		contentPanel.setVisible(false);
 		this.add(contentPanel, BorderLayout.CENTER);
+	}
+
+	public void updatePanelVisibility()
+	{
+		Token t = tokenManager.getActiveToken();
+		if (tokenManager.isValidModifyToken(t))
+		{
+			authPanel.setVisible(false);
+			contentPanel.setVisible(true);
+			return;
+		}
+		authPanel.setVisible(true);
+		contentPanel.setVisible(false);
 	}
 
 	public void handleSuccessfulLogin() {

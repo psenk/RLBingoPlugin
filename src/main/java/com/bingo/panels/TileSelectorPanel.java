@@ -1,6 +1,5 @@
 package com.bingo.panels;
 
-import com.bingo.BingoScapePlugin;
 import com.bingo.bingo.BingoBoard;
 import com.bingo.bingo.BingoGame;
 import java.awt.BorderLayout;
@@ -9,34 +8,29 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import lombok.Setter;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 
 @ConfigGroup("bingo")
-public class TileSelectorPanel extends JPanel implements BoardListener
+public class TileSelectorPanel extends JPanel
 {
+	private final BingoGame activeGame;
+
 	private static final ImageIcon ARROW_DOWN_ICON;
 	private static final ImageIcon ARROW_DOWN_ICON_HOVER;
 	private static final ImageIcon ARROW_UP_ICON;
 	private static final ImageIcon ARROW_UP_ICON_HOVER;
 
-	public JButton backButton;
-
-	private Map<BingoBoard, JPanel> boardPanels = new HashMap<>();
-	private Map<BingoBoard, Boolean> panelStates;
-
-	private BingoScapePlugin plugin;
-
-	@Setter
-	private BingoGame game;
+	private final Map<BingoBoard, JPanel> boardPanels = new HashMap<>();
+	private final Map<BingoBoard, Boolean> panelStates;
 
 	static
 	{
@@ -49,36 +43,23 @@ public class TileSelectorPanel extends JPanel implements BoardListener
 		ARROW_UP_ICON_HOVER = new ImageIcon(ImageUtil.luminanceOffset(arrowUpIcon, -100));
 	}
 
-	public TileSelectorPanel(BingoGame game)
+	public TileSelectorPanel(BingoGame activeGame)
 	{
 		super(false);
-		this.game = game;
+		this.activeGame = activeGame;
 		this.panelStates = new HashMap<>();
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-		if (this.game.getBingoBoards() != null && !this.game.getBingoBoards().isEmpty())
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+		if (this.activeGame.getBingoBoards() != null)
 		{
 			displayBoards();
 		}
 	}
 
-	@Override
-	public void onBoardAdded(BingoBoard board)
-	{
-		this.createBoardHeaderPanel(board);
-		this.revalidate();
-		this.repaint();
-	}
-
-	@Override
-	public void onBoardRemoved(BingoBoard board)
-	{
-		return;
-	}
-
 	public void displayBoards()
 	{
-		for (BingoBoard board : this.game.getBingoBoards().values())
+		for (BingoBoard board : this.activeGame.getBingoBoards().values())
 		{
 			panelStates.putIfAbsent(board, true);
 			JPanel headerPanel = createBoardHeaderPanel(board);
@@ -97,7 +78,7 @@ public class TileSelectorPanel extends JPanel implements BoardListener
 		headerPanel.add(boardTitle, BorderLayout.WEST);
 
 		JButton expandButton = new JButton(ARROW_DOWN_ICON);
-		expandButton.setBorder(BorderFactory.createEmptyBorder());
+		expandButton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		expandButton.setContentAreaFilled(false);
 		expandButton.addMouseListener(new MouseAdapter()
 		{
@@ -162,7 +143,7 @@ public class TileSelectorPanel extends JPanel implements BoardListener
 			for (int j = 0; j < board.getBoardWidth(); j++)
 			{
 				JButton tileButton = new JButton(String.valueOf(count));
-				tileButton.setBorder(BorderFactory.createLineBorder(ColorScheme.BORDER_COLOR));
+				tileButton.setBorder(new LineBorder(ColorScheme.BORDER_COLOR));
 				tileButton.setContentAreaFilled(false);
 				rowPanel.add(tileButton);
 				count++;

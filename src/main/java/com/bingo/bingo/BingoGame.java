@@ -7,33 +7,32 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
 public class BingoGame
 {
-	@Getter
-	public int bingoID;
-
-	@Getter
-	@Setter
-	public String bingoTitle;
-
-	@Getter
-	@Setter
-	public String bingoDescription;
-
-	@Getter
-	@Setter
-	public int bingoDuration;
+	private int bingoID;
 
 	@Setter
-	@Getter
-	public List<String> bingoTeams;
+	private String bingoTitle;
 
-	@Getter
-	public Map<Integer, BingoBoard> bingoBoards;
+	@Setter
+	private String bingoDescription;
+
+	@Setter
+	private int bingoDuration;
+
+	@Setter
+	private List<String> bingoTeams;
+
+	private Map<Integer, BingoBoard> bingoBoards;
 
 	public BingoGame()
 	{
-
+		this.bingoTitle = "";
+		this.bingoDescription = "";
+		this.bingoDuration = 0;
+		this.bingoTeams = new ArrayList<>();
+		this.bingoBoards = new HashMap<>();
 	}
 
 	public BingoGame(int id)
@@ -41,23 +40,21 @@ public class BingoGame
 		this.bingoID = id;
 	}
 
-	public BingoGame(String title, String description, int duration, List<String> teams, Map<Integer, BingoBoard> boards)
-	{
-		this.bingoTitle = title;
-		this.bingoDescription = description;
-		this.bingoDuration = duration;
-		this.bingoTeams = teams;
-		this.bingoBoards = boards;
-	}
-
 	public void addBingoBoard(BingoBoard board)
 	{
 		this.bingoBoards.put(bingoBoards.size() + 1, board);
 	}
 
-	public void removeBingoBoard(int id)
+	public void removeBingoBoard(BingoBoard board)
 	{
-		this.bingoBoards.remove(id);
+		for (int i = 0; i < this.bingoBoards.size(); i++)
+		{
+			if (this.bingoBoards.get(i).equals(board))
+			{
+				this.bingoBoards.remove(i);
+			}
+		}
+
 	}
 
 	public BingoBoard getBingoBoard(int id)

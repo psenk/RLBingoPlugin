@@ -20,7 +20,6 @@ public class TokenManager
 	public void setActiveToken(Token t)
 	{
 		String tokenJson = gson.toJson(t);
-		System.out.println("WE DID IT!!");
 		configManager.setConfiguration("bingo", "activeToken", tokenJson);
 	}
 
@@ -34,9 +33,30 @@ public class TokenManager
 		return gson.fromJson(configValue, Token.class);
 	}
 
-	public boolean isValidToken(Token t)
+	public boolean isValidActiveToken(Token t)
 	{
-		return t != null && t.getId() != 0;
+		return t != null && t.getId() != 0 && t.getType().equals("ACTIVE");
+	}
+
+	public void setModifyToken(Token t)
+	{
+		String tokenJson = gson.toJson(t);
+		configManager.setConfiguration("bingo", "modifyToken", tokenJson);
+	}
+
+	public Token getModifyToken()
+	{
+		String configValue = configManager.getConfiguration("bingo", "modifyToken");
+		if (configValue == null)
+		{
+			return null;
+		}
+		return gson.fromJson(configValue, Token.class);
+	}
+
+	public boolean isValidModifyToken(Token t)
+	{
+		return t != null && t.getId() != 0 && t.getType().equals("MODIFY");
 	}
 
 	public void destroyToken()

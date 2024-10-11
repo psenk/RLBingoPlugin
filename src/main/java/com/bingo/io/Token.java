@@ -7,6 +7,7 @@ import lombok.Getter;
 public class Token
 {
 	private Integer id = 0;
+	private String type;
 
 	public Token()
 	{
@@ -25,5 +26,17 @@ public class Token
 	public Token(Integer id)
 	{
 		this.id = id;
+	}
+
+	public Token(String type)
+	{
+		this.id = 0; // null token
+		this.type = type;
+	}
+
+	public Token(Integer id, String type)
+	{
+		this.id = id;
+		this.type = type;
 	}
 }

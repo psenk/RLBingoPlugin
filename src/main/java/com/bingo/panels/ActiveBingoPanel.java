@@ -30,8 +30,8 @@ public class ActiveBingoPanel extends PluginPanel
 		this.setLayout(new BorderLayout());
 
 		JPanel headerPanel = new JPanel();
-		authPanel = new AuthPanel(plugin, BingoConfig.Panel.ACTIVE);
-		authPanel.unhideAdminPanel(false);
+		authPanel = new AuthPanel(plugin, tokenManager, BingoConfig.Panel.ACTIVE);
+		authPanel.showAdminPanel(false);
 		headerPanel.add(authPanel);
 
 		// TODO: await?
@@ -46,7 +46,7 @@ public class ActiveBingoPanel extends PluginPanel
 	public void updatePanelVisibility()
 	{
 		Token t = tokenManager.getActiveToken();
-		if (tokenManager.isValidToken(t))
+		if (tokenManager.isValidActiveToken(t))
 		{
 			authPanel.setVisible(false);
 			teamPanel.setVisible(true);

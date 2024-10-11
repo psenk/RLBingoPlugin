@@ -3,9 +3,11 @@ package com.bingo;
 import com.bingo.io.Token;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.function.Supplier;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.ui.PluginPanel;
 
 // https://github.com/KATalyzt36/TutorialRunelitePlugins
 // https://github.com/runelite/runelite/wiki/Creating-plugin-config-panels
@@ -13,7 +15,7 @@ import net.runelite.client.config.ConfigItem;
 @ConfigGroup("bingo")
 public interface BingoConfig extends Config
 {
-	// TODO: move this enum somewhere else
+	// TODO: move this enum somewhere else?
 	enum Panel
 	{
 		MAIN("", "BingoScape home screen."),
@@ -106,11 +108,22 @@ public interface BingoConfig extends Config
 	@ConfigItem(
 		keyName = "activeToken",
 		name = "Active Token",
-		description = "Active session token.",
+		description = "Session token for an active bingo.",
 		hidden = true
 	)
 	default Token activeToken()
 	{
-		return new Token(0);
+		return new Token("ACTIVE");
+	}
+
+	@ConfigItem(
+		keyName = "modifyToken",
+		name = "Modify Token",
+		description = "Session token for modifying a bingo.",
+		hidden = true
+	)
+	default Token modifyToken()
+	{
+		return new Token("MODIFY");
 	}
 }

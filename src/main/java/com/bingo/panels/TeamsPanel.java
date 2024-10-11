@@ -1,14 +1,12 @@
 package com.bingo.panels;
 
+import com.bingo.bingo.BingoGame;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -17,14 +15,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import lombok.Getter;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.ImageUtil;
 
 public class TeamsPanel extends JPanel
 {
-	@Getter
-	private final List<String> teamNames;
+	private BingoGame activeGame;
 
 	private static final ImageIcon ADD_ICON;
 	private static final ImageIcon ADD_ICON_HOVER;
@@ -51,23 +49,24 @@ public class TeamsPanel extends JPanel
 		EDIT_ICON_HOVER = new ImageIcon(ImageUtil.luminanceOffset(editIcon, -100));
 	}
 
-	public TeamsPanel()
+	public TeamsPanel(BingoGame activeGame)
 	{
-		this.setLayout(new BorderLayout());
-		this.teamNames = new ArrayList<>();
+		this.activeGame = activeGame;
+		setLayout(new BorderLayout());
 
 		JPanel headerPanel = new JPanel(new BorderLayout());
 		headerPanel.setBackground(ColorScheme.CONTROL_COLOR);
+		headerPanel.setBorder(new LineBorder(ColorScheme.BORDER_COLOR));
 
 		JLabel headerLabel = new JLabel("Teams");
 		headerLabel.setForeground(ColorScheme.TEXT_COLOR);
-		headerLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		headerLabel.setBorder(new EmptyBorder(0, 5, 0, 5));
 		headerPanel.add(headerLabel, BorderLayout.WEST);
 
 		JPanel headerButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
 		JButton addTeamButton = new JButton(ADD_ICON);
-		addTeamButton.setBorder(BorderFactory.createEmptyBorder());
+		addTeamButton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		addTeamButton.setContentAreaFilled(false);
 		addTeamButton.addMouseListener(new MouseAdapter()
 		{
@@ -95,17 +94,16 @@ public class TeamsPanel extends JPanel
 		headerButtons.add(addTeamButton);
 
 		headerPanel.add(headerButtons, BorderLayout.EAST);
-		this.add(headerPanel, BorderLayout.NORTH);
+		add(headerPanel, BorderLayout.NORTH);
 
 		teamsListPanel = new JPanel();
 		teamsListPanel.setLayout(new BoxLayout(teamsListPanel, BoxLayout.Y_AXIS));
 		teamsListPanel.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
-		teamsListPanel.setPreferredSize(new Dimension(225, 800));
 
 		teamsScrollPane = new JScrollPane(teamsListPanel);
 		teamsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-		teamsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		this.add(teamsScrollPane, BorderLayout.CENTER);
+		teamsScrollPane.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
+		add(teamsScrollPane, BorderLayout.CENTER);
 	}
 
 	private void addNewTeam()
@@ -114,12 +112,12 @@ public class TeamsPanel extends JPanel
 
 		if (teamName != null && !teamName.trim().isEmpty())
 		{
-			if (teamNames.contains(teamName))
+			if (activeGame.getBingoTeams().contains(teamName))
 			{
 				JOptionPane.showMessageDialog(this, "This team already exists.", "Duplicate Tea,", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			teamNames.add(teamName);
+			this.activeGame.addTeam(teamName);
 			refreshTeamList();
 		}
 	}
@@ -127,23 +125,17 @@ public class TeamsPanel extends JPanel
 	private void refreshTeamList()
 	{
 		teamsListPanel.removeAll();
+		teamsScrollPane.getVerticalScrollBar().setValue(0);
 
-		for (String teamName : teamNames)
+		for (String teamName : activeGame.getBingoTeams())
 		{
 			JPanel teamPanel = createTeamPanel(teamName);
 			teamPanel.setForeground(ColorScheme.TEXT_COLOR);
 			teamsListPanel.add(teamPanel);
 		}
+		teamsScrollPane.setVerticalScrollBarPolicy(teamsListPanel.getPreferredSize().height > teamsScrollPane.getViewport().getHeight() ? JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED : JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 
-		if (teamNames.size() >= 5)
-		{
-			teamsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		}
-		else
-		{
-			teamsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-		}
-		teamsScrollPane.setVisible(!teamNames.isEmpty());
+		teamsScrollPane.setVisible(!activeGame.getBingoTeams().isEmpty());
 
 		teamsListPanel.revalidate();
 		teamsListPanel.repaint();
@@ -153,7 +145,8 @@ public class TeamsPanel extends JPanel
 	{
 		JPanel teamPanel = new JPanel(new BorderLayout());
 		teamPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-		teamPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+		teamPanel.setBorder(new EmptyBorder(0, 10, 0, 10));
+		teamPanel.setBorder(new LineBorder(ColorScheme.BORDER_COLOR));
 		teamPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 
 		JLabel teamNameLabel = new JLabel(teamName);
@@ -163,7 +156,7 @@ public class TeamsPanel extends JPanel
 		JPanel panelButtons = new JPanel(new FlowLayout());
 
 		JButton editButton = new JButton(EDIT_ICON);
-		editButton.setBorder(BorderFactory.createEmptyBorder());
+		editButton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		editButton.setContentAreaFilled(false);
 		editButton.addMouseListener(new MouseAdapter()
 		{
@@ -188,10 +181,16 @@ public class TeamsPanel extends JPanel
 		panelButtons.add(editButton);
 
 		JButton deleteButton = new JButton(DELETE_ICON);
-		deleteButton.setBorder(BorderFactory.createEmptyBorder());
+		deleteButton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		deleteButton.setContentAreaFilled(false);
 		deleteButton.addMouseListener(new MouseAdapter()
 		{
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				deleteTeam(teamName);
+			}
+
 			@Override
 			public void mouseEntered(MouseEvent e)
 			{
@@ -202,12 +201,6 @@ public class TeamsPanel extends JPanel
 			public void mouseExited(MouseEvent e)
 			{
 				deleteButton.setIcon(DELETE_ICON);
-			}
-
-			@Override
-			public void mouseClicked(MouseEvent e)
-			{
-				deleteTeam(teamName);
 			}
 		});
 		panelButtons.add(deleteButton);
@@ -222,7 +215,7 @@ public class TeamsPanel extends JPanel
 
 		if (confirm == JOptionPane.YES_OPTION)
 		{
-			teamNames.remove(teamName);
+			activeGame.getBingoTeams().remove(teamName);
 			refreshTeamList();
 		}
 	}
@@ -232,13 +225,13 @@ public class TeamsPanel extends JPanel
 		String newName = JOptionPane.showInputDialog(this, "Edit Team Name:", teamName);
 		if (newName != null && !newName.trim().isEmpty())
 		{
-			if (teamNames.contains(newName) && !newName.equals(teamName))
+			if (activeGame.getBingoTeams().contains(newName) && !newName.equals(teamName))
 			{
 				JOptionPane.showMessageDialog(this, "This team name already exists.", "Duplicate Team", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			teamNames.remove(teamName);
-			teamNames.add(newName);
+			activeGame.getBingoTeams().remove(teamName);
+			activeGame.getBingoTeams().add(newName);
 			refreshTeamList();
 		}
 	}

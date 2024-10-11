@@ -34,7 +34,7 @@ public class BingoScapePluginPanel extends PluginPanel
 
 	private final JLabel githubButton;
 	private final JLabel homeButton;
-	String GITHUB_LINK = "https://github.com/psenk/RLBingoPlugin";
+	private final String GITHUB_LINK = "https://github.com/psenk/RLBingoPlugin";
 
 	private final JPanel contentPanel;
 
